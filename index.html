@@ -12,8 +12,8 @@ body {
   padding: 20px 12px; min-height: 100vh; width: 100%;
 }
 h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: clamp(14px,4vw,18px); margin-bottom: 8px; text-align: center; }
-#subtitle { opacity: 0.4; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; }
-#gregorian { color: #ff8c00; font-size: clamp(10px,2.5vw,12px); margin-bottom: 16px; letter-spacing: 1px; text-align: center; }
+#subtitle { opacity: 0.85; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; }
+#gregorian { color: #4da6ff; font-size: clamp(10px,2.5vw,12px); margin-bottom: 16px; letter-spacing: 1px; text-align: center; }
 #controls { display: flex; gap: 8px; margin-bottom: 6px; width: 100%; max-width: 340px; }
 input {
   padding: 8px 12px; background: rgba(255,255,255,0.07);
@@ -27,19 +27,33 @@ button {
   font-weight: bold; font-family: Georgia, serif; font-size: 14px; white-space: nowrap;
 }
 #error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; text-align: center; }
-#cityLabel { opacity: 0.5; font-size: 12px; margin-bottom: 12px; text-align: center; }
+#cityLabel { opacity: 0.85; font-size: 12px; margin-bottom: 12px; text-align: center; }
 #cityLabel strong { color: #f5c842; }
-#debug { font-size: 11px; color: #888; margin-bottom: 16px; font-family: monospace; text-align: center; word-break: break-all; padding: 0 8px; }
+#debug { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 16px; font-family: monospace; text-align: center; word-break: break-all; padding: 0 8px; }
 #mainContainer { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; width: 100%; }
 #clockCol { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 canvas { display: block; border-radius: 50%; max-width: 100%; }
-#solarPoints { font-size: clamp(10px,2.5vw,12px); opacity: 0.5; text-align: center; line-height: 1.9; }
-#solarDoW { font-size: clamp(10px,2.5vw,11px); opacity: 0.55; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
-#solarDoW .dow-header { color: #ff8c00; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
-#solarDoW .yr-prev { color: #ff8c00; opacity: 0.6; }
-#solarDoW .yr-curr { color: #ff8c00; font-weight: bold; }
-#solarDoW .yr-next { color: #ff8c00; opacity: 0.6; }
-#gridContainer { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; width: 100%; max-width: 320px; }
+#solarPoints { font-size: clamp(10px,2.5vw,12px); opacity: 0.85; text-align: center; line-height: 1.9; }
+#solarDoW { font-size: clamp(10px,2.5vw,11px); opacity: 0.85; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+#solarDoW .dow-header { color: #4da6ff; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
+#solarDoW .yr-prev { color: #4da6ff; opacity: 0.6; }
+#solarDoW .yr-curr { color: #4da6ff; font-weight: bold; }
+#solarDoW .yr-next { color: #4da6ff; opacity: 0.6; }
+#gridWrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#gridHeading { text-align: center; line-height: 1.7; }
+#gridHeading .season-name { font-size: clamp(13px,3vw,16px); font-weight: bold; color: #f5c842; letter-spacing: 3px; text-transform: uppercase; }
+#gridHeading .enoch-year { font-size: clamp(10px,2.5vw,12px); color: rgba(255,255,255,0.7); letter-spacing: 2px; }
+#gridHeading .greg-year  { font-size: clamp(10px,2.5vw,12px); color: #4da6ff; letter-spacing: 2px; }
+#gridHeading .season-angel { font-size: clamp(10px,2.5vw,11px); color: rgba(255,255,255,0.6); letter-spacing: 1px; font-style: italic; }
+#gridHeading .season-start { font-size: clamp(10px,2.5vw,11px); letter-spacing: 1px; margin-top: 2px; }
+#gridCarousel { display: flex; align-items: center; gap: 6px; width: 100%; }
+.arrow-btn {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: white; font-size: 18px; border-radius: 6px; cursor: pointer;
+  padding: 6px 10px; flex-shrink: 0; user-select: none; line-height: 1;
+}
+.arrow-btn:hover { background: rgba(255,255,255,0.18); }
+#gridContainer { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 350px; }
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
   aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
@@ -66,6 +80,27 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
 .dayBox:hover .tooltip { display: block; }
 .dayNum { font-size: 13px; }
 .angelLabel { font-size: 7px; opacity: 0.6; }
+/* Feast outlines use box-shadow so they layer without overlapping borders */
+.dayBox.feast-holy    { box-shadow: 0 0 0 2px #ffe600; }
+.dayBox.feast-sabbath { box-shadow: 0 0 0 2px #add8e6; }
+.dayBox.feast-fast    { box-shadow: 0 0 0 2px #ff3333; }
+.dayBox.feast-holy.feast-sabbath    { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #add8e6; }
+.dayBox.feast-holy.feast-fast       { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #ff3333; }
+.dayBox.feast-sabbath.feast-fast    { box-shadow: 0 0 0 2px #add8e6, 0 0 0 4px #ff3333; }
+.dayBox.feast-holy.feast-sabbath.feast-fast { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #add8e6, 0 0 0 6px #ff3333; }
+#feastSidebar { font-size: 11px; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; min-width: 200px; max-width: 280px; }
+#feastSidebar .feast-section-header { font-size: 11px; letter-spacing: 1px; font-weight: bold; margin-top: 8px; margin-bottom: 2px; }
+#feastSidebar .feast-entry { display: flex; gap: 6px; align-items: baseline; }
+#feastSidebar .feast-date { color: rgba(255,255,255,0.5); min-width: 28px; font-size: 10px; }
+#feastSidebar .feast-name { color: white; }
+#feastSidebar .feast-tag  { font-size: 9px; opacity: 0.6; font-style: italic; }
+#feastSidebar .feast-name-wrap { display: inline; }
+#feast-tooltip {
+  display: none; position: fixed; z-index: 100;
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+  padding: 6px 10px; font-size: 10px; font-style: italic; color: rgba(255,255,255,0.8);
+  width: 220px; line-height: 1.5; pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -85,12 +120,28 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
     <canvas id="clockCanvas" width="280" height="280" style="width:min(280px,85vw);height:min(280px,85vw)"></canvas>
     <div id="solarPoints"></div>
     <div id="solarDoW"></div>
+    <div id="feastSidebar"></div>
   </div>
-  <div id="gridContainer"></div>
+  <div id="gridWrapper">
+    <div id="gridHeading">
+      <div class="season-name" id="headingSeason">SPRING</div>
+      <div class="season-angel" id="headingSeasonAngel">Season Angel: Melkeyal</div>
+      <div class="enoch-year" id="headingEnochYear">YEAR 7569</div>
+      <div class="greg-year"  id="headingGregYear">2026 AD</div>
+      <div class="season-start" id="headingSeasonStart">Season Start: 21 December</div>
+    </div>
+    <div id="gridCarousel">
+      <button class="arrow-btn" id="prevQuarter">&#8249;</button>
+      <div id="gridContainer"></div>
+      <button class="arrow-btn" id="nextQuarter">&#8250;</button>
+    </div>
+  </div>
 </div>
 
 <script>
 "use strict";
+
+let quarterOffset = 0; // 0=current quarter, negative=past, positive=future
 
 // US/Canada DST: starts 2nd Sunday of March, ends 1st Sunday of November
 function isDST(utcDate, observesDST) {
@@ -114,13 +165,22 @@ const CITY_DB = {
 
 // Build month lengths for a given Enoch year start (the March 20 equinox date)
 // Summer Month 2 (index 4) always has 31 days.
-// Winter Month 2 (index 10) has 31 days in Gregorian leap years.
+// Winter Month 2 (index 10) has 31 days if the Gregorian year it falls in is a leap year.
+// Winter II starts after 9 months (274 days) + 30 days = day 305 of the Enoch year,
+// which falls in January/February of the year AFTER the equinox year.
+function isLeapYear(year) {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
 function getMonths(equinoxYear) {
-  const isLeap = (equinoxYear % 4 === 0 && equinoxYear % 100 !== 0) || equinoxYear % 400 === 0;
+  // Winter II starts ~305 days after the spring equinox — work out which Gregorian year that lands in
+  // Spring equinox is ~Mar 20, +305 days = ~Jan 19 of the following year
+  // So Winter II always falls in equinoxYear + 1
+  const winterTwoYear = equinoxYear + 1;
+  const leapWinter = isLeapYear(winterTwoYear);
   return [30, 30, 31,  // Spring
           30, 31, 31,  // Summer (month 2 = 31)
           30, 30, 31,  // Autumn
-          30, isLeap ? 31 : 30, 31]; // Winter (month 2 = 31 in leap years)
+          30, leapWinter ? 31 : 30, 31]; // Winter (month 2 = 31 if next year is leap)
 }
 const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
@@ -155,17 +215,54 @@ function sunTimes(date, lat, lon, tzOff) {
   return { sunrise: 12 - ha / 15 - TC, sunset: 12 + ha / 15 - TC };
 }
 
-function getEnoch(utcDate) {
-  // Use UTC date to find Enoch position
-  let eq = new Date(Date.UTC(utcDate.getUTCFullYear(), 2, 20));
-  if (utcDate < eq) eq = new Date(Date.UTC(utcDate.getUTCFullYear() - 1, 2, 20));
-  const MONTHS = getMonths(eq.getUTCFullYear());
+function getEnoch(utcDate, cityObj) {
+  // Enoch day boundary = local sunrise at the spring equinox, not midnight
+  // cityObj is optional — if omitted, falls back to midnight UTC boundary
+  const c = cityObj || null;
+
+  // Find the spring equinox UTC date for this cycle
+  let eqYear = utcDate.getUTCFullYear();
+  // Approximate equinox as Mar 20 to find the right year first
+  let eqApprox = new Date(Date.UTC(eqYear, 2, 20));
+  if (utcDate < eqApprox) eqApprox = new Date(Date.UTC(eqYear - 1, 2, 20));
+  const eqYearFinal = eqApprox.getUTCFullYear();
+
+  // Get precise equinox UTC time from Meeus
+  const preciseEqUTC = solarEventUTC(eqYearFinal, 0);
+
+  // Calculate sunrise time on the spring equinox day in city local time
+  // Sunrise time is the Enoch "day 1 start" — every subsequent day starts at the same clock time
+  let dayBoundaryUTC; // UTC time of the start of Enoch day 1
+  if (c) {
+    // DST offset on the day of the equinox (not today — use the equinox date for DST check)
+    const eqDSTOffset = c.stdOffset + (isDST(preciseEqUTC, c.dst) ? 1 : 0);
+    // Sunrise on equinox day
+    const sr = sunTimes(preciseEqUTC, c.lat, c.lon, eqDSTOffset);
+    // sr.sunrise is in local decimal hours — convert to UTC ms
+    // The equinox local date
+    const eqLocalMidnightUTC = new Date(preciseEqUTC.getTime() + eqDSTOffset * 3600000);
+    const eqLocalDate = new Date(Date.UTC(
+      eqLocalMidnightUTC.getUTCFullYear(),
+      eqLocalMidnightUTC.getUTCMonth(),
+      eqLocalMidnightUTC.getUTCDate()
+    ));
+    // Sunrise UTC = local equinox midnight UTC + sunrise hours - DST offset
+    dayBoundaryUTC = new Date(eqLocalDate.getTime() + (sr.sunrise - eqDSTOffset) * 3600000);
+  } else {
+    // Fallback: use midnight UTC of the equinox date
+    dayBoundaryUTC = new Date(Date.UTC(eqYearFinal, 2, 20));
+  }
+
+  const MONTHS = getMonths(eqYearFinal);
   const yearLen = MONTHS.reduce((a, b) => a + b, 0);
-  const diff = Math.floor((utcDate - eq) / 86400000) + 1;
+
+  // Each Enoch day is exactly 86400000ms starting from dayBoundaryUTC
+  const msElapsed = utcDate - dayBoundaryUTC;
+  const diff = Math.floor(msElapsed / 86400000) + 1;
   const doy  = ((diff - 1) % yearLen) + 1;
   let idx = 0, dc = doy;
   for (const m of MONTHS) { if (dc <= m) break; dc -= m; idx++; }
-  return { year: 7569 + (eq.getUTCFullYear() - 2025), day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1, months: MONTHS };
+  return { year: 7569 + (eqYearFinal - 2025), day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1, months: MONTHS, dayBoundaryUTC };
 }
 
 // 24h decimal hour → canvas angle (0h = top, clockwise)
@@ -240,35 +337,72 @@ function drawClock(cityDate, tzOff) {
     ctx.fillText(i, x, y);
   }
 
-  // 6. Hour hand
-  const hVal = localH + localM / 60 + localS / 3600;
+  // 6. Hour hand (24h face — full rotation every 24h)
+  const hVal   = localH + localM / 60 + localS / 3600;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + R * 0.54 * Math.cos(toAngle(hVal)), cy + R * 0.54 * Math.sin(toAngle(hVal)));
+  ctx.lineTo(cx + R * 0.50 * Math.cos(toAngle(hVal)), cy + R * 0.50 * Math.sin(toAngle(hVal)));
   ctx.strokeStyle = "#ff3333"; ctx.lineWidth = 3; ctx.lineCap = "round";
   ctx.stroke();
 
-  // 7. Minute hand (position on 24h face)
-  const totalMins = localH * 60 + localM + localS / 60;
-  const mAngle    = (totalMins / 1440) * 2 * Math.PI - Math.PI / 2;
+  // 7. Minute hand (standard: full rotation every 60 minutes)
+  const mAngle = ((localM + localS / 60) / 60) * 2 * Math.PI - Math.PI / 2;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + R * 0.72 * Math.cos(mAngle), cy + R * 0.72 * Math.sin(mAngle));
-  ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = 1.5; ctx.lineCap = "round";
+  ctx.lineTo(cx + R * 0.70 * Math.cos(mAngle), cy + R * 0.70 * Math.sin(mAngle));
+  ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 2; ctx.lineCap = "round";
   ctx.stroke();
 
-  // 8. Centre dot
+  // 8. Seconds hand (full rotation every 60 seconds)
+  const sAngle = (localS / 60) * 2 * Math.PI - Math.PI / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + R * 0.80 * Math.cos(sAngle), cy + R * 0.80 * Math.sin(sAngle));
+  ctx.strokeStyle = "rgba(255,180,0,0.9)"; ctx.lineWidth = 1; ctx.lineCap = "round";
+  ctx.stroke();
+
+  // 9. Centre dot
   ctx.beginPath();
   ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
   ctx.fillStyle = "#ff3333"; ctx.fill();
 }
 
-function drawGrid(enoch, springEqDate) {
+function drawGrid(enoch, springEqDate, qOffset) {
   const g = document.getElementById("gridContainer");
   g.innerHTML = "";
-  // Map each Enoch weekday column to its Gregorian equivalent for this year
+
+  // 1. Resolve which quarter and year to display — MUST come first
+  const currentQuarterIdx = Math.floor(enoch.monthIndex / 3);
+  let absQuarter = currentQuarterIdx + qOffset;
+  let yearShift = 0;
+  while (absQuarter < 0) { absQuarter += 4; yearShift--; }
+  while (absQuarter > 3) { absQuarter -= 4; yearShift++; }
+  const displayQuarterIdx = absQuarter;
+
+  const targetEqYear = springEqDate.getUTCFullYear() + yearShift;
+  const targetSpringEq = solarEventUTC(targetEqYear, 0);
+  const MONTHS = getMonths(targetEqYear);
+
+  // 2. Compute targetDayBoundary (sunrise on equinox day) for tooltip dates + G-DoW headers
   const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const eqOffset = springEqDate.getUTCDay(); // Gregorian DoW of spring equinox = Enoch day 1
+  const eqDSTOff = city.stdOffset + (isDST(targetSpringEq, city.dst) ? 1 : 0);
+  const srEq = sunTimes(targetSpringEq, city.lat, city.lon, eqDSTOff);
+  const eqLocalMidnight = new Date(targetSpringEq.getTime() + eqDSTOff * 3600000);
+  const eqMidnightUTC = new Date(Date.UTC(
+    eqLocalMidnight.getUTCFullYear(), eqLocalMidnight.getUTCMonth(), eqLocalMidnight.getUTCDate()
+  ));
+  const targetDayBoundary = new Date(eqMidnightUTC.getTime() + (srEq.sunrise - eqDSTOff) * 3600000);
+  const boundaryLocal = new Date(targetDayBoundary.getTime() + eqDSTOff * 3600000);
+  const springDay1GDoW = boundaryLocal.getUTCDay();
+
+  // 3. Compute quarter base + daysBeforeQuarter BEFORE rendering headers
+  const base = displayQuarterIdx * 3;
+  let daysBeforeQuarter = 0;
+  for (let m = 0; m < base; m++) daysBeforeQuarter += MONTHS[m];
+  // G-DoW of Enoch col 0 (Sunday) for this quarter
+  const eqOffset = (springDay1GDoW + daysBeforeQuarter % 7) % 7;
+
+  // 4. Render column headers (eqOffset now defined)
   const ENOCH_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
   for (let i = 0; i < 7; i++) {
     const gName = G_WD[(eqOffset + i) % 7];
@@ -280,27 +414,283 @@ function drawGrid(enoch, springEqDate) {
     h.innerHTML = `<span style="color:${headerColor}">${ENOCH_WD[i]}</span><br><span style="font-size:9px;color:${subColor};font-weight:normal">${gName}</span>`;
     g.appendChild(h);
   }
-  const MONTHS = enoch.months;
-  const base = enoch.monthIndex - (enoch.monthIndex % 3);
-  // Count days from spring equinox to the start of this quarter
-  let daysBeforeQuarter = 0;
-  for (let m = 0; m < base; m++) daysBeforeQuarter += MONTHS[m];
+
+  // Update headings
+  const SEASONS_LABEL = ["SPRING","SUMMER","AUTUMN","WINTER"];
+  const seasonStartDate = new Date(targetSpringEq.getTime() + daysBeforeQuarter * 86400000);
+  const displayEnoch = getEnoch(seasonStartDate);
+  const quarterMidDay = Math.floor((MONTHS[base] + MONTHS[base+1] + MONTHS[base+2]) / 2);
+  const quarterMidDate = new Date(targetSpringEq.getTime() + (daysBeforeQuarter + quarterMidDay) * 86400000);
+  const SEASON_ANGELS = ["Melkeyal", "Helemmelek", "Meleyal", "Narel"];
+  // Use the middle month colour of the season as the representative colour for the label
+  const SEASON_LABEL_COLORS = [
+    "rgb(80, 140, 20)",    // Spring M2 - mid green
+    "rgb(200, 100, 0)",    // Summer M2 - amber
+    "rgb(110, 50, 30)",    // Autumn M2 - rust brown
+    "rgb(75, 75, 85)",     // Winter M2 - mid grey
+  ];
+  const G_MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const seasonColor = SEASON_LABEL_COLORS[displayQuarterIdx];
+  const seasonStartStr = seasonStartDate.getUTCDate() + " " + G_MONTHS_LONG[seasonStartDate.getUTCMonth()];
+  document.getElementById("headingSeason").textContent = SEASONS_LABEL[displayQuarterIdx];
+  document.getElementById("headingSeason").style.color = seasonColor;
+  document.getElementById("headingSeasonAngel").textContent = "Season Angel: " + SEASON_ANGELS[displayQuarterIdx];
+  document.getElementById("headingEnochYear").textContent = "YEAR " + displayEnoch.year;
+  document.getElementById("headingGregYear").textContent = quarterMidDate.getUTCFullYear() + " AD";
+  document.getElementById("headingSeasonStart").textContent = "Season Start: " + seasonStartStr;
+  document.getElementById("headingSeasonStart").style.color = seasonColor;
+  // Each month gets a solid colour — 3 distinct steps per season
+  // Spring M1→M3: dark green, mid green, yellow-green
+  // Summer M1→M3: golden yellow, amber, orange-red
+  // Autumn M1→M3: deep red, rust, dark charcoal
+  // Winter M1→M3: dark grey, mid grey, blue-grey
+  const MONTH_COLORS = [
+    "rgb(30, 100, 30)",    // Spring M1 - dark green
+    "rgb(80, 140, 20)",    // Spring M2 - mid green
+    "rgb(140, 175, 0)",    // Spring M3 - yellow-green
+    "rgb(190, 160, 0)",    // Summer M1 - golden yellow
+    "rgb(200, 100, 0)",    // Summer M2 - amber
+    "rgb(180, 45, 0)",     // Summer M3 - orange-red
+    "rgb(150, 30, 10)",    // Autumn M1 - deep red
+    "rgb(110, 50, 30)",    // Autumn M2 - rust brown
+    "rgb(65, 55, 50)",     // Autumn M3 - dark charcoal
+    "rgb(55, 55, 65)",     // Winter M1 - dark grey-blue
+    "rgb(75, 75, 85)",     // Winter M2 - mid grey
+    "rgb(85, 90, 100)",    // Winter M3 - lighter blue-grey
+  ];
+
+  function seasonBoxColor(monthIdx) {
+    return MONTH_COLORS[monthIdx] || "rgba(255,255,255,0.04)";
+  }
+
   let col = 0;
   for (let i = 0; i < 3; i++) {
     for (let d = 1; d <= MONTHS[base + i]; d++) {
       const box = document.createElement("div");
-      const isCurrent = (base + i === enoch.monthIndex && d === enoch.day);
+      const isCurrent = (yearShift === 0 && displayQuarterIdx === currentQuarterIdx && base + i === enoch.monthIndex && d === enoch.day);
       const isSat = (col % 7 === 6);
-      box.className = "dayBox" + (isCurrent ? " current" : (isSat ? " saturday" : ""));
+      // Apply season colour (skip for current day and saturday which have their own styles)
+      if (!isCurrent && !isSat) {
+        box.style.background = seasonBoxColor(base + i);
+        box.style.borderColor = "rgba(0,0,0,0.15)";
+        box.style.color = "#fff";
+      }
+      // Feast outlines
+      const dayFeasts = getFeastsForDay(base + i, d, MONTHS);
+      const hasHoly    = dayFeasts.some(f => f.types.includes("holy"));
+      const hasSabbath = dayFeasts.some(f => f.types.includes("sabbath"));
+      const hasFast    = dayFeasts.some(f => f.types.includes("fast"));
+      const hasHoliday = dayFeasts.some(f => f.types.includes("holiday"));
+      let feastClasses = "";
+      if (hasHoly)              feastClasses += " feast-holy";
+      if (hasSabbath || hasHoliday) feastClasses += " feast-sabbath";
+      if (hasFast)              feastClasses += " feast-fast";
+      box.className = "dayBox" + (isCurrent ? " current" : (isSat ? " saturday" : "")) + feastClasses;
       // Gregorian date = spring equinox + days before this quarter + position within quarter
-      const gregDate = new Date(springEqDate.getTime() + (daysBeforeQuarter + col) * 86400000);
+      const gregDate = new Date(targetDayBoundary.getTime() + (daysBeforeQuarter + col) * 86400000);
       const G_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       const gregStr = gregDate.getUTCDate() + " " + G_MONTHS[gregDate.getUTCMonth()];
-      box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span><span class="tooltip">${gregStr}</span>`;
+      const feastNames = dayFeasts.map(f => f.name).join(", ");
+      box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span><span class="tooltip">${gregStr}${feastNames ? " · " + feastNames : ""}</span>`;
       g.appendChild(box);
       col++;
     }
   }
+  updateFeastSidebar(displayQuarterIdx, MONTHS);
+}
+
+function solarEventUTC(year, which) {
+  // which: 0=spring, 1=summer, 2=autumn, 3=winter
+  const Y = (year - 2000) / 1000;
+  const JDE0s = [
+    2451623.80984 + 365242.37404*Y + 0.05169*Y*Y - 0.00411*Y*Y*Y - 0.00057*Y*Y*Y*Y,
+    2451716.56767 + 365241.62603*Y + 0.00325*Y*Y + 0.00888*Y*Y*Y - 0.00030*Y*Y*Y*Y,
+    2451810.21715 + 365242.01767*Y - 0.11575*Y*Y + 0.00337*Y*Y*Y + 0.00078*Y*Y*Y*Y,
+    2451900.05952 + 365242.74049*Y - 0.06223*Y*Y - 0.00823*Y*Y*Y + 0.00032*Y*Y*Y*Y,
+  ];
+  let JDE = JDE0s[which];
+  const T = (JDE - 2451545) / 36525;
+  const W = 35999.373*T - 2.47;
+  const dL = 1 + 0.0334*Math.cos(W*Math.PI/180) + 0.0007*Math.cos(2*W*Math.PI/180);
+  const terms = [
+    [485,324.96,1934.136],[203,337.23,32964.467],[199,342.08,20.186],
+    [182,27.85,445267.112],[156,73.14,45036.886],[136,171.52,22518.443],
+    [77,222.54,65928.934],[74,296.72,3034.906],[70,243.58,9037.513],
+    [58,119.81,33718.147],[52,297.17,150.678],[50,21.02,2281.226],
+    [45,247.54,29929.562],[44,325.15,31555.956],[29,60.93,4443.417],
+    [18,155.12,67555.328],[17,288.79,4562.452],[16,198.04,62894.029],
+    [14,199.76,31557.370],[12,95.39,14577.848],[10,49.11,31071.843],
+    [10,165.57,628.302],[10,146.57,20199.711],[10,110.02,16859.074]
+  ];
+  let S = 0;
+  for (const [a, b, cc] of terms) {
+    S += a * Math.cos((b + cc * T) * Math.PI / 180);
+  }
+  JDE += S * 0.00001 / dL;
+  return new Date((JDE - 2440587.5) * 86400000);
+}
+
+function fmtSolarLocal(utcDate, cityTzOff) {
+  const local = new Date(utcDate.getTime() + cityTzOff * 3600000);
+  const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const G_WD_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const dow = G_WD_LONG[local.getUTCDay()];
+  const mo  = MONTHS_LONG[local.getUTCMonth()];
+  const dy  = local.getUTCDate();
+  const hh  = String(local.getUTCHours()).padStart(2,"0");
+  const mm  = String(local.getUTCMinutes()).padStart(2,"0");
+  return `${dow} ${mo} ${dy}  ${hh}:${mm}`;
+}
+
+
+// ─── FEAST DATA ───────────────────────────────────────────────────────────────
+// monthIdx: 0-11 (Enoch months, 0=Spring I)
+// day: start day within that month
+// duration: number of days
+// types: array of 'holy', 'sabbath', 'fast', 'holiday'
+const FEASTS = [
+  // ── SPRING (months 0-2) ──
+  { name: "New Year (1 Nisan)",               monthIdx: 0,  day: 1,  dur: 1, types: ["holiday"] },
+  { name: "Passover",                          monthIdx: 0,  day: 14, dur: 1, types: ["holy","sabbath"] },
+  { name: "First Day of Unleavened Bread",     monthIdx: 0,  day: 15, dur: 1, types: ["holy","sabbath"] },
+  { name: "Feast of Unleavened Bread",         monthIdx: 0,  day: 16, dur: 5, types: ["holy"] },
+  { name: "Last Day of Unleavened Bread",      monthIdx: 0,  day: 21, dur: 1, types: ["holy","sabbath"] },
+  { name: "First Fruits",                      monthIdx: 0,  day: 22, dur: 1, types: ["holy"] },
+  { name: "Shavuot (Pentecost)",               monthIdx: 2,  day: 11, dur: 1, types: ["holy","sabbath"] },
+  // ── AUTUMN (months 6-8) ──
+  { name: "Yom Teru'ah (Feast of Trumpets)",   monthIdx: 6,  day: 1,  dur: 1, types: ["holy","sabbath"] },
+  { name: "Yom Kippur Eve",                    monthIdx: 6,  day: 9,  dur: 1, types: ["fast"] },
+  { name: "Yom Kippur (Day of Atonement)",     monthIdx: 6,  day: 10, dur: 1, types: ["holy","sabbath","fast"] },
+  { name: "First Day of Sukkot",               monthIdx: 6,  day: 15, dur: 1, types: ["holy","sabbath"] },
+  { name: "Sukkot (Feast of Tabernacles)",     monthIdx: 6,  day: 16, dur: 5, types: ["holy"] },
+  { name: "Last Day of Sukkot",                monthIdx: 6,  day: 21, dur: 1, types: ["holy","sabbath"] },
+  { name: "Shemini Atzeret",                   monthIdx: 6,  day: 22, dur: 1, types: ["holy","sabbath"] },
+  // ── WINTER (months 9-11) ──
+  { name: "Hannukah (Festival of Lights)",     monthIdx: 8,  day: 25, dur: 8, types: ["holiday"] },
+  { name: "Purim",                             monthIdx: 11, day: 13, dur: 1, types: ["holiday"], desc: "Celebrated by reading or listening to the Book of Esther, sending two different edible items to at least one person, giving money to two needy people, and a large, joyous feast." },
+];
+
+// Build a lookup: key = "monthIdx:day" -> array of feast objects active on that day
+function buildFeastLookup() {
+  const lookup = {};
+  for (const f of FEASTS) {
+    for (let d = 0; d < f.dur; d++) {
+      // Handle month overflow (e.g. Hannukah spans month 8 day 25 → month 9)
+      // We'll track absolute day within the year for overflow handling
+      const key = f.monthIdx + ':' + (f.day + d);
+      if (!lookup[key]) lookup[key] = [];
+      lookup[key].push(f);
+    }
+  }
+  return lookup;
+}
+
+// Resolve feast lookup key accounting for month overflow
+function getFeastsForDay(monthIdx, day, months) {
+  const results = [];
+  // Days in this month
+  const mLen = months[monthIdx];
+  if (day <= mLen) {
+    // Normal — day is within this month
+    const key = monthIdx + ':' + day;
+    if (feastLookup[key]) results.push(...feastLookup[key]);
+  }
+  // Also check if a feast from the previous month overflows into this day
+  // e.g. Hannukah: monthIdx=8 day=25, duration=8 → days 25-31 (month 8 has 31 days) then day 1 of month 9
+  // We handle this by checking if any feast starting in prevMonth overflows here
+  if (monthIdx > 0) {
+    const prevMonthLen = months[monthIdx - 1];
+    for (const f of FEASTS) {
+      if (f.monthIdx === monthIdx - 1) {
+        const overflowStart = f.day + f.dur - 1; // last day of feast
+        if (overflowStart > prevMonthLen) {
+          // feast overflows into this month
+          const overflowDay = day + prevMonthLen - f.day; // which day of the feast is this?
+          if (overflowDay >= 0 && overflowDay < f.dur && day <= overflowStart - prevMonthLen) {
+            if (!results.find(r => r.name === f.name)) results.push(f);
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
+const feastLookup = buildFeastLookup();
+
+function updateFeastSidebar(displayQuarterIdx, months) {
+  const base = displayQuarterIdx * 3;
+  const sidebar = document.getElementById("feastSidebar");
+  const MONTH_NAMES = ["Spring I","Spring II","Spring III","Summer I","Summer II","Summer III",
+                       "Autumn I","Autumn II","Autumn III","Winter I","Winter II","Winter III"];
+
+  // Format a feast date range as "Spring I, 14" or "Autumn III, 25 – Winter I, 6"
+  function feastDateLabel(f, months) {
+    const startLabel = MONTH_NAMES[f.monthIdx] + ", " + f.day;
+    if (f.dur === 1) return startLabel;
+    // Calculate end month and day accounting for month overflow
+    let endMonthIdx = f.monthIdx;
+    let endDay = f.day + f.dur - 1;
+    while (endMonthIdx < 11 && endDay > months[endMonthIdx]) {
+      endDay -= months[endMonthIdx];
+      endMonthIdx++;
+    }
+    const endLabel = MONTH_NAMES[endMonthIdx] + ", " + endDay;
+    if (endMonthIdx === f.monthIdx) {
+      return startLabel + "–" + endDay;
+    }
+    return startLabel + " – " + endLabel;
+  }
+
+  // Collect feasts visible in this quarter (starts here OR overflows from previous month)
+  const holyFeasts = [];
+  const holidays = [];
+
+  for (const f of FEASTS) {
+    const inQuarter = f.monthIdx >= base && f.monthIdx < base + 3;
+    // Overflow: feast starts in last month of previous quarter and spills into this one
+    const overflowFromPrev = base > 0 && f.monthIdx === base - 1
+      && (f.day + f.dur - 1) > months[base - 1];
+    if (!inQuarter && !overflowFromPrev) continue;
+
+    const isHoly = f.types.includes("holy") || f.types.includes("sabbath") || f.types.includes("fast");
+    if (f.types.includes("holiday") && !isHoly) holidays.push(f);
+    else holyFeasts.push(f);
+  }
+
+  let html = "";
+  if (holyFeasts.length > 0) {
+    html += `<div class="feast-section-header" style="color:#ffe600">✦ HOLY FEASTS</div>`;
+    for (const f of holyFeasts) {
+      const tags = f.types.filter(t => t !== "holy").map(t =>
+        t === "sabbath" ? "Sabbath" : t === "fast" ? "Fast" : ""
+      ).filter(Boolean).join(", ");
+      const dateLabel = feastDateLabel(f, months);
+      const nameHtml = f.desc
+        ? `<span class="feast-name-wrap"><span class="feast-name" style="cursor:help;text-decoration:underline dotted rgba(255,255,255,0.4)" data-desc="${f.desc.replace(/"/g,'&quot;')}">${f.name}</span></span>`
+        : `<span class="feast-name">${f.name}</span>`;
+      html += `<div class="feast-entry">` +
+        `<span class="feast-date" style="min-width:0;margin-right:4px;color:rgba(255,255,255,0.6)">${dateLabel}</span>` +
+        nameHtml +
+        `${tags ? `<span class="feast-tag">(${tags})</span>` : ""}` +
+        `</div>`;
+    }
+  }
+  if (holidays.length > 0) {
+    html += `<div class="feast-section-header" style="color:#aaffaa;margin-top:8px">✦ SPECIAL DAYS</div>`;
+    for (const f of holidays) {
+      const dateLabel = feastDateLabel(f, months);
+      const nameHtml2 = f.desc
+        ? `<span class="feast-name-wrap"><span class="feast-name" style="cursor:help;text-decoration:underline dotted rgba(255,255,255,0.4)" data-desc="${f.desc.replace(/"/g,'&quot;')}">${f.name}</span></span>`
+        : `<span class="feast-name">${f.name}</span>`;
+      html += `<div class="feast-entry">` +
+        `<span class="feast-date" style="min-width:0;margin-right:4px;color:rgba(255,255,255,0.6)">${dateLabel}</span>` +
+        nameHtml2 +
+        `</div>`;
+    }
+  }
+  if (html === "") html = `<div style="opacity:0.4;font-size:10px">No feasts this season</div>`;
+  sidebar.innerHTML = html;
 }
 
 function update() {
@@ -308,7 +698,7 @@ function update() {
   const tzOff    = getCityOffset(city);
   // Shift UTC time by tzOff hours; read result via getUTC* methods = local city time
   const cityDate = new Date(utcNow.getTime() + tzOff * 3600000);
-  const enoch    = getEnoch(utcNow);
+  const enoch    = getEnoch(utcNow, city);
   const yr       = cityDate.getUTCFullYear();
 
   const hh = String(cityDate.getUTCHours()).padStart(2,"0");
@@ -336,53 +726,6 @@ function update() {
   document.getElementById("timeDisplay").textContent = `${hh}:${mm}:${ss}`;
   // Jean Meeus algorithm for equinox/solstice times, accurate to ~minutes for any year
   // Returns a Date object in UTC
-  function solarEventUTC(year, which) {
-    // which: 0=spring, 1=summer, 2=autumn, 3=winter
-    const Y = (year - 2000) / 1000;
-    // JDE estimates for each event (Tables 27.a/27.b from Meeus)
-    const JDE0s = [
-      2451623.80984 + 365242.37404*Y + 0.05169*Y*Y - 0.00411*Y*Y*Y - 0.00057*Y*Y*Y*Y,
-      2451716.56767 + 365241.62603*Y + 0.00325*Y*Y + 0.00888*Y*Y*Y - 0.00030*Y*Y*Y*Y,
-      2451810.21715 + 365242.01767*Y - 0.11575*Y*Y + 0.00337*Y*Y*Y + 0.00078*Y*Y*Y*Y,
-      2451900.05952 + 365242.74049*Y - 0.06223*Y*Y - 0.00823*Y*Y*Y + 0.00032*Y*Y*Y*Y,
-    ];
-    let JDE = JDE0s[which];
-    // Correction terms
-    const T = (JDE - 2451545) / 36525;
-    const W = 35999.373*T - 2.47;
-    const dL = 1 + 0.0334*Math.cos(W*Math.PI/180) + 0.0007*Math.cos(2*W*Math.PI/180);
-    // Periodic terms (abridged from Meeus Table 27.c)
-    const terms = [
-      [485,324.96,1934.136],[203,337.23,32964.467],[199,342.08,20.186],
-      [182,27.85,445267.112],[156,73.14,45036.886],[136,171.52,22518.443],
-      [77,222.54,65928.934],[74,296.72,3034.906],[70,243.58,9037.513],
-      [58,119.81,33718.147],[52,297.17,150.678],[50,21.02,2281.226],
-      [45,247.54,29929.562],[44,325.15,31555.956],[29,60.93,4443.417],
-      [18,155.12,67555.328],[17,288.79,4562.452],[16,198.04,62894.029],
-      [14,199.76,31557.370],[12,95.39,14577.848],[10,49.11,31071.843],
-      [10,165.57,628.302],[10,146.57,20199.711],[10,110.02,16859.074]
-    ];
-    let S = 0;
-    for (const [a, b, cc] of terms) {
-      S += a * Math.cos((b + cc * T) * Math.PI / 180);
-    }
-    JDE += S * 0.00001 / dL;
-    // Convert JDE to Unix timestamp (ms)
-    return new Date((JDE - 2440587.5) * 86400000);
-  }
-
-  function fmtSolarLocal(utcDate, cityTzOff) {
-    const local = new Date(utcDate.getTime() + cityTzOff * 3600000);
-    const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const G_WD_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    const dow = G_WD_LONG[local.getUTCDay()];
-    const mo  = MONTHS_LONG[local.getUTCMonth()];
-    const dy  = local.getUTCDate();
-    const hh  = String(local.getUTCHours()).padStart(2,"0");
-    const mm  = String(local.getUTCMinutes()).padStart(2,"0");
-    return `${dow} ${mo} ${dy}  ${hh}:${mm}`;
-  }
-
   const solarTzOff = getCityOffset(city);
   document.getElementById("solarPoints").innerHTML =
     `🌅 Spring Eq: ${fmtSolarLocal(solarEventUTC(yr, 0), solarTzOff)}<br>` +
@@ -405,9 +748,23 @@ function update() {
     `<span class="yr-next">${nextYr}: ${sabbathGDoW(nextYr)}</span>`;
 
   drawClock(cityDate, tzOff);
-  // Spring equinox UTC date for this Enoch year (used for G-DoW mapping in grid)
-  const springEqForGrid = solarEventUTC(yr, 0);
-  drawGrid(enoch, springEqForGrid);
+  // springEqForGrid: use the precise equinox UTC time already computed in getEnoch
+  // dayBoundaryUTC is the sunrise on the equinox day = Enoch day 1 start
+  // Back-calculate the equinox year from dayBoundaryUTC for solarEventUTC lookup
+  const enochEqYear = enoch.dayBoundaryUTC.getUTCFullYear() === new Date(enoch.dayBoundaryUTC.getTime()).getUTCFullYear()
+    ? (() => {
+        // dayBoundaryUTC is sunrise on Mar 19/20 of the equinox year
+        const d = enoch.dayBoundaryUTC;
+        return d.getUTCMonth() >= 2 ? d.getUTCFullYear() : d.getUTCFullYear() - 1;
+      })()
+    : enoch.dayBoundaryUTC.getUTCFullYear();
+  const springEqForGrid = solarEventUTC(
+    enoch.dayBoundaryUTC.getUTCMonth() >= 2
+      ? enoch.dayBoundaryUTC.getUTCFullYear()
+      : enoch.dayBoundaryUTC.getUTCFullYear() - 1,
+    0
+  );
+  drawGrid(enoch, springEqForGrid, quarterOffset);
 }
 
 document.getElementById("setCity").addEventListener("click", () => {
@@ -424,8 +781,76 @@ document.getElementById("cityInput").addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("setCity").click();
 });
 
+document.getElementById("prevQuarter").addEventListener("click", () => {
+  quarterOffset--;
+  const utcNow = new Date();
+  const enoch = getEnoch(utcNow, city);
+  const eqYr = enoch.dayBoundaryUTC.getUTCMonth() >= 2
+    ? enoch.dayBoundaryUTC.getUTCFullYear()
+    : enoch.dayBoundaryUTC.getUTCFullYear() - 1;
+  drawGrid(enoch, solarEventUTC(eqYr, 0), quarterOffset);
+});
+document.getElementById("nextQuarter").addEventListener("click", () => {
+  quarterOffset++;
+  const utcNow = new Date();
+  const enoch = getEnoch(utcNow, city);
+  const eqYr = enoch.dayBoundaryUTC.getUTCMonth() >= 2
+    ? enoch.dayBoundaryUTC.getUTCFullYear()
+    : enoch.dayBoundaryUTC.getUTCFullYear() - 1;
+  drawGrid(enoch, solarEventUTC(eqYr, 0), quarterOffset);
+});
+
 setInterval(update, 1000);
+
+// Feast description tooltip — fixed position, never affects layout
+// Use document.addEventListener to ensure DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  const feastTooltip = document.getElementById("feast-tooltip");
+  const sidebar = document.getElementById("feastSidebar");
+  if (!feastTooltip || !sidebar) return;
+  function showTooltip(el, clientX, clientY) {
+    feastTooltip.textContent = el.dataset.desc;
+    feastTooltip.style.display = "block";
+    const tw = 220, th = feastTooltip.offsetHeight;
+    let x = clientX + 10;
+    let y = clientY - th - 8;
+    if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+    if (y < 8) y = clientY + 16;
+    feastTooltip.style.left = x + "px";
+    feastTooltip.style.top  = y + "px";
+  }
+
+  // Mouse events
+  sidebar.addEventListener("mouseover", e => {
+    const el = e.target.closest("[data-desc]");
+    if (!el) { feastTooltip.style.display = "none"; return; }
+    showTooltip(el, e.clientX, e.clientY);
+  });
+  sidebar.addEventListener("mousemove", e => {
+    const el = e.target.closest("[data-desc]");
+    if (!el) { feastTooltip.style.display = "none"; return; }
+    showTooltip(el, e.clientX, e.clientY);
+  });
+  sidebar.addEventListener("mouseout", e => {
+    if (!e.target.closest("[data-desc]")) feastTooltip.style.display = "none";
+  });
+
+  // Touch events — tap to show, tap elsewhere to hide
+  sidebar.addEventListener("touchstart", e => {
+    const el = e.target.closest("[data-desc]");
+    if (!el) { feastTooltip.style.display = "none"; return; }
+    e.preventDefault();
+    const t = e.touches[0];
+    showTooltip(el, t.clientX, t.clientY);
+  }, { passive: false });
+  document.addEventListener("touchstart", e => {
+    if (!e.target.closest("[data-desc]") && !e.target.closest("#feast-tooltip")) {
+      feastTooltip.style.display = "none";
+    }
+  });
+});
 update();
 </script>
+<div id="feast-tooltip"></div>
 </body>
 </html>
