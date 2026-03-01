@@ -40,6 +40,7 @@ canvas { display: block; border-radius: 50%; }
   background: rgba(255,255,255,0.04); color: white;
 }
 .dayBox.current { border: 2px solid #f5c842; background: #f5c842; color: #000; font-weight: bold; }
+.dayBox.saturday { background: #add8e6; color: #000; border-color: #add8e6; }
 .dayNum { font-size: 13px; }
 .angelLabel { font-size: 7px; opacity: 0.6; }
 </style>
@@ -234,12 +235,16 @@ function drawGrid(enoch) {
     h.className = "dayHeader"; h.textContent = lbl; g.appendChild(h);
   }
   const base = enoch.monthIndex - (enoch.monthIndex % 3);
+  let col = 0;
   for (let i = 0; i < 3; i++) {
     for (let d = 1; d <= MONTHS[base + i]; d++) {
       const box = document.createElement("div");
-      box.className = "dayBox" + ((base + i === enoch.monthIndex && d === enoch.day) ? " current" : "");
+      const isCurrent = (base + i === enoch.monthIndex && d === enoch.day);
+      const isSat = (col % 7 === 6);
+      box.className = "dayBox" + (isCurrent ? " current" : (isSat ? " saturday" : ""));
       box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span>`;
       g.appendChild(box);
+      col++;
     }
   }
 }
@@ -256,8 +261,9 @@ function update() {
   const mm = String(cityDate.getUTCMinutes()).padStart(2,"0");
   const ss = String(cityDate.getUTCSeconds()).padStart(2,"0");
 
+  const WD_NAMES = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
   document.getElementById("subtitle").textContent =
-    `YEAR ${enoch.year} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday}`;
+    `YEAR ${enoch.year} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday} (${WD_NAMES[enoch.weekday-1]})`;
   document.getElementById("timeDisplay").textContent = `${hh}:${mm}:${ss}`;
   document.getElementById("solarPoints").innerHTML =
     `🌅 Spring Eq: ${new Date(yr,2,20).toLocaleDateString()}<br>` +
