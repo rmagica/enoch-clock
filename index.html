@@ -6,58 +6,69 @@
 
 <style>
 body{
-  font-family:Arial;
-  background:black;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:20px;
+  font-family: Arial;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-#controls{margin-bottom:20px;}
-input{padding:6px;font-size:16px;width:220px;}
-button{padding:6px 10px;font-size:16px;}
+#controls{
+  margin-bottom: 20px;
+}
+
+input{
+  padding: 6px;
+  font-size: 16px;
+  width: 220px;
+}
+
+button{
+  padding: 6px 10px;
+  font-size: 16px;
+}
 
 #mainContainer{
-  display:flex;
-  gap:40px;
-  align-items:flex-start;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
 }
 
 #gridContainer{
-  display:grid;
-  grid-template-columns:repeat(7,40px);
-  grid-gap:4px;
+  display: grid;
+  grid-template-columns: repeat(7,40px);
+  grid-gap: 4px;
 }
 
 .dayHeader{
-  font-weight:bold;
-  color:yellow;
-  text-align:center;
+  font-weight: bold;
+  color: yellow;
+  text-align: center;
 }
 
 .dayBox{
-  width:40px;
-  height:40px;
-  border:1px solid white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  text-align:center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  text-align: center;
 }
 
 .dayBox.current{
-  background:orange;
-  color:black;
-  font-weight:bold;
+  background: orange;
+  color: black;
+  font-weight: bold;
 }
 
 canvas{
-  margin-top:20px;
-  background:#222;
-  border-radius:50%;
+  margin-top: 20px;
+  background: #222;
+  border-radius: 50%;
 }
 </style>
 </head>
@@ -81,47 +92,41 @@ City:
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded",function(){
+document.addEventListener("DOMContentLoaded", function() {
 
-const months=[30,30,31,30,30,31,30,30,31,30,30,31];
-const monthAngels=["Adnarel","Iyasusael","Ijelumiel"];
+const months = [30,30,31,30,30,31,30,30,31,30,30,31];
+const monthAngels = ["Adnarel","Iyasusael","Ijelumiel"];
 
-const cityDB={
-"vancouver":{lat:49.2827,lon:-123.1207,tz:"America/Vancouver"},
-"hawaii":{lat:21.3069,lon:-157.8583,tz:"Pacific/Honolulu"},
-"guadalajara":{lat:20.6597,lon:-103.3496,tz:"America/Mexico_City"}
+const cityDB = {
+  "vancouver": {lat:49.2827, lon:-123.1207, tz:"America/Vancouver"},
+  "hawaii": {lat:21.3069, lon:-157.8583, tz:"Pacific/Honolulu"},
+  "guadalajara": {lat:20.6597, lon:-103.3496, tz:"America/Mexico_City"}
 };
 
-let location=cityDB.vancouver;
+let location = cityDB.vancouver;
 
 function nowTZ(tz){
   return new Date(new Date().toLocaleString("en-US",{timeZone:tz}));
 }
 
+// Stable Sun Times
 function getSunTimes(date, lat, lon){
   const rad = Math.PI/180;
-
   const startOfYear = new Date(date.getFullYear(),0,0);
   const day = Math.floor((date - startOfYear)/86400000);
-
   const decl = 23.44 * rad * Math.sin(2*Math.PI*(day-81)/365);
 
   let cosH = -Math.tan(lat*rad)*Math.tan(decl);
-
-  // clamp safely
   cosH = Math.min(1, Math.max(-1, cosH));
-
   const ha = Math.acos(cosH);
   const daylightHours = (ha * 180/Math.PI) / 15;
 
   let sunrise = 12 - daylightHours - lon/15;
   let sunset  = 12 + daylightHours - lon/15;
 
-  // normalize to 0–24 range
   sunrise = (sunrise + 24) % 24;
-  sunset  = (sunset  + 24) % 24;
+  sunset  = (sunset + 24) % 24;
 
-  // if sunrise equals sunset (extreme edge case)
   if(Math.abs(sunrise - sunset) < 0.01){
     sunrise = 6;
     sunset = 18;
@@ -129,43 +134,44 @@ function getSunTimes(date, lat, lon){
 
   return { sunrise, sunset };
 }
+
 function getSolarPoints(year){
   return {
-    spring:new Date(year,2,20),
-    summer:new Date(year,5,21),
-    autumn:new Date(year,8,22),
-    winter:new Date(year,11,21)
+    spring: new Date(year,2,20),
+    summer: new Date(year,5,21),
+    autumn: new Date(year,8,22),
+    winter: new Date(year,11,21)
   };
 }
 
 function getEnoch(now){
-  let eq=new Date(now.getFullYear(),2,20);
-  if(now<eq) eq.setFullYear(eq.getFullYear()-1);
-  let diff=Math.floor((now-eq)/86400000)+1;
-  let doy=((diff-1)%364)+1;
+  let eq = new Date(now.getFullYear(),2,20);
+  if(now < eq) eq.setFullYear(eq.getFullYear()-1);
+  let diff = Math.floor((now - eq)/86400000) + 1;
+  let doy = ((diff-1)%364) + 1;
 
-  let idx=0,dc=doy;
+  let idx=0, dc=doy;
   for(let m of months){
-    if(dc<=m) break;
-    dc-=m; idx++;
+    if(dc <= m) break;
+    dc -= m; idx++;
   }
 
-  return{year:7569,day:dc,monthIndex:idx,weekday:((diff-1)%7)+1};
+  return {year:7569, day:dc, monthIndex:idx, weekday:((diff-1)%7)+1};
 }
 
 function drawGrid(enoch){
-  const g=document.getElementById("gridContainer");
-  g.innerHTML="";
+  const g = document.getElementById("gridContainer");
+  g.innerHTML = "";
   ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(d=>{
-    let h=document.createElement("div");
+    let h = document.createElement("div");
     h.className="dayHeader";
     h.textContent=d;
     g.appendChild(h);
   });
 
-  let base=enoch.monthIndex-enoch.monthIndex%3;
-  for(let i=0;i<3;i++){
-    for(let d=1;d<=months[base+i];d++){
+  let base = enoch.monthIndex - enoch.monthIndex%3;
+  for(let i=0; i<3; i++){
+    for(let d=1; d<=months[base+i]; d++){
       let b=document.createElement("div");
       b.className="dayBox";
       if(base+i===enoch.monthIndex && d===enoch.day) b.classList.add("current");
@@ -183,58 +189,59 @@ function drawClock(now){
   ctx.clearRect(0,0,c.width,c.height);
   ctx.translate(r,r);
 
-  const sun=getSunTimes(now,location.lat,location.lon);
-  const sr=sun.sunrise, ss=sun.sunset;
+  const sun = getSunTimes(now, location.lat, location.lon);
+  const sr = sun.sunrise;
+  const ss = sun.sunset;
 
-  const ang=h=>(h/24)*2*Math.PI-Math.PI/2;
+  const ang = h => (h/24)*2*Math.PI - Math.PI/2;
 
-  // daylight first (yellow)
+  // Daylight first (yellow)
   ctx.beginPath();
   ctx.moveTo(0,0);
   ctx.arc(0,0,r,ang(sr),ang(ss),false);
   ctx.fillStyle="yellow";
   ctx.fill();
 
-  // night (dark blue)
+  // Night (dark blue)
   ctx.beginPath();
   ctx.moveTo(0,0);
   ctx.arc(0,0,r,ang(ss),ang(sr),false);
   ctx.fillStyle="#001f4d";
   ctx.fill();
 
-  // outer border
+  // Outer border
   ctx.beginPath();
   ctx.arc(0,0,r,0,Math.PI*2);
   ctx.strokeStyle="white";
   ctx.stroke();
 
-  // hour hand
-  let h=now.getHours()+now.getMinutes()/60;
+  // Hour hand
+  let h = now.getHours() + now.getMinutes()/60;
   ctx.beginPath();
   ctx.moveTo(0,0);
-  ctx.lineTo(r*0.8*Math.cos(ang(h)),r*0.8*Math.sin(ang(h)));
+  ctx.lineTo(r*0.8*Math.cos(ang(h)), r*0.8*Math.sin(ang(h)));
   ctx.strokeStyle="red";
   ctx.lineWidth=3;
   ctx.stroke();
 
-  // hour numbers
+  // Hour numbers
   ctx.font="12px Arial";
   ctx.textAlign="center";
   ctx.textBaseline="middle";
   for(let i=0;i<24;i++){
     let a=ang(i);
-    let isDay=i>=sr && i<ss;
-    ctx.fillStyle=isDay?"black":"white";
-    ctx.fillText(i,r*0.9*Math.cos(a),r*0.9*Math.sin(a));
+    let isDay = (i >= sr && i < ss) || (sr > ss && (i >= sr || i < ss)); // wraparound
+    ctx.fillStyle = isDay ? "black" : "white";
+    ctx.fillText(i, r*0.9*Math.cos(a), r*0.9*Math.sin(a));
   }
 }
 
 function update(){
-  let now=nowTZ(location.tz);
-  let e=getEnoch(now);
-  let solar=getSolarPoints(now.getFullYear());
+  let now = nowTZ(location.tz);
+  let e = getEnoch(now);
+  let solar = getSolarPoints(now.getFullYear());
 
-  document.getElementById("clock").innerHTML=
+  document.getElementById("clock").innerHTML =
     "Local Time: "+now.toLocaleString()+
     "<br>Enoch Year: "+e.year+
     "<br>Day: "+e.day+
@@ -252,14 +259,15 @@ function update(){
 setInterval(update,1000);
 update();
 
-document.getElementById("setCity").onclick=()=>{
-  let v=cityInput.value.toLowerCase();
-  if(cityDB[v]) location=cityDB[v];
+document.getElementById("setCity").onclick = () => {
+  let v = cityInput.value.toLowerCase();
+  if(cityDB[v]) {
+    location = cityDB[v];
+  }
 };
 
+}); // End of DOMContentLoaded
 </script>
 
 </body>
-
 </html>
-
