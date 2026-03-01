@@ -3,271 +3,355 @@
 <head>
 <meta charset="UTF-8">
 <title>Enoch Calendar Visual</title>
-
 <style>
-body{
-  font-family: Arial;
-  background: black;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
-
-#controls{
-  margin-bottom: 20px;
-}
-
-input{
-  padding: 6px;
-  font-size: 16px;
-  width: 220px;
-}
-
-button{
-  padding: 6px 10px;
-  font-size: 16px;
-}
-
-#mainContainer{
-  display: flex;
-  gap: 40px;
-  align-items: flex-start;
-}
-
-#gridContainer{
-  display: grid;
-  grid-template-columns: repeat(7,40px);
-  grid-gap: 4px;
-}
-
-.dayHeader{
-  font-weight: bold;
-  color: yellow;
-  text-align: center;
-}
-
-.dayBox{
-  width: 40px;
-  height: 40px;
-  border: 1px solid white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  text-align: center;
-}
-
-.dayBox.current{
-  background: orange;
-  color: black;
-  font-weight: bold;
-}
-
-canvas{
-  margin-top: 20px;
-  background: #222;
-  border-radius: 50%;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #080c14;
+    color: white;
+    font-family: Georgia, serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    min-height: 100vh;
+  }
+  h2 {
+    letter-spacing: 4px;
+    color: #f5c842;
+    text-transform: uppercase;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  #subtitle {
+    opacity: 0.4;
+    font-size: 12px;
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+  }
+  #controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  input {
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    width: 220px;
+    font-family: Georgia, serif;
+  }
+  input::placeholder { color: rgba(255,255,255,0.35); }
+  button {
+    padding: 8px 14px;
+    background: #f5c842;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: Georgia, serif;
+    font-size: 14px;
+  }
+  button:hover { background: #ffd85a; }
+  #error { color: #ff6666; font-size: 12px; margin-bottom: 8px; min-height: 18px; }
+  #cityLabel {
+    opacity: 0.5;
+    font-size: 12px;
+    margin-bottom: 28px;
+  }
+  #cityLabel strong { color: #f5c842; }
+  #mainContainer {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  #clockCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  canvas {
+    border-radius: 50%;
+    background: #111;
+    display: block;
+  }
+  #solarPoints {
+    font-size: 12px;
+    opacity: 0.5;
+    text-align: center;
+    line-height: 1.9;
+  }
+  #gridContainer {
+    display: grid;
+    grid-template-columns: repeat(7, 42px);
+    gap: 3px;
+  }
+  .dayHeader {
+    color: #f5c842;
+    font-weight: bold;
+    text-align: center;
+    font-size: 11px;
+    padding: 4px 0;
+  }
+  .dayBox {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    background: rgba(255,255,255,0.04);
+    color: white;
+  }
+  .dayBox.current {
+    border: 2px solid #f5c842;
+    background: #f5c842;
+    color: #000;
+    font-weight: bold;
+  }
+  .dayBox .dayNum { font-size: 13px; }
+  .dayBox .angelLabel { font-size: 7px; opacity: 0.6; }
 </style>
 </head>
-
 <body>
 
-<h2>Enoch Calendar Visual</h2>
+<h2>Enoch Calendar</h2>
+<div id="subtitle">YEAR · DAY · WEEKDAY</div>
 
 <div id="controls">
-City:
-<input id="cityInput" placeholder="Enter city (e.g. Vancouver)">
-<button id="setCity">Set City</button>
+  <input id="cityInput" placeholder="Enter city (e.g. Vancouver)">
+  <button id="setCity">Set</button>
 </div>
+<div id="error"></div>
+<div id="cityLabel">Currently: <strong id="cityName">vancouver</strong> · <span id="timeDisplay"></span></div>
 
 <div id="mainContainer">
-  <div>
-    <canvas id="clockCanvas" width="260" height="260"></canvas>
-    <div id="clock"></div>
+  <div id="clockCol">
+    <canvas id="clockCanvas" width="280" height="280"></canvas>
+    <div id="solarPoints"></div>
   </div>
   <div id="gridContainer"></div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-
-const months = [30,30,31,30,30,31,30,30,31,30,30,31];
-const monthAngels = ["Adnarel","Iyasusael","Ijelumiel"];
-
 const cityDB = {
-  "vancouver": {lat:49.2827, lon:-123.1207, tz:"America/Vancouver"},
-  "hawaii": {lat:21.3069, lon:-157.8583, tz:"Pacific/Honolulu"},
-  "guadalajara": {lat:20.6597, lon:-103.3496, tz:"America/Mexico_City"}
+  vancouver:   { lat: 49.2827,  lon: -123.1207, tz: "America/Vancouver" },
+  hawaii:      { lat: 21.3069,  lon: -157.8583, tz: "Pacific/Honolulu" },
+  guadalajara: { lat: 20.6597,  lon: -103.3496, tz: "America/Mexico_City" },
 };
 
-let location = cityDB.vancouver;
+const MONTHS = [30,30,31,30,30,31,30,30,31,30,30,31];
+const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
-function nowTZ(tz){
-  return new Date(new Date().toLocaleString("en-US",{timeZone:tz}));
+let currentCity = cityDB.vancouver;
+
+function nowInTZ(tz) {
+  return new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
 }
 
-// Stable Sun Times
-function getSunTimes(date, lat, lon){
-  const rad = Math.PI/180;
-  const startOfYear = new Date(date.getFullYear(),0,0);
-  const day = Math.floor((date - startOfYear)/86400000);
-  const decl = 23.44 * rad * Math.sin(2*Math.PI*(day-81)/365);
-
-  let cosH = -Math.tan(lat*rad)*Math.tan(decl);
-  cosH = Math.min(1, Math.max(-1, cosH));
-  const ha = Math.acos(cosH);
-  const daylightHours = (ha * 180/Math.PI) / 15;
-
-  let sunrise = 12 - daylightHours - lon/15;
-  let sunset  = 12 + daylightHours - lon/15;
-
-  sunrise = (sunrise + 24) % 24;
-  sunset  = (sunset + 24) % 24;
-
-  if(Math.abs(sunrise - sunset) < 0.01){
-    sunrise = 6;
-    sunset = 18;
-  }
-
-  return { sunrise, sunset };
+function getTZOffsetHours(tz) {
+  const now = new Date();
+  const local = new Date(now.toLocaleString("en-US", { timeZone: tz }));
+  return (local - now) / 3600000;
 }
 
-function getSolarPoints(year){
+function getSunTimes(date, lat, lon, tzOffsetHours) {
+  const rad = Math.PI / 180;
+  const start = new Date(date.getFullYear(), 0, 1);
+  const doy = Math.round((date - start) / 86400000) + 1;
+
+  const decl = 23.45 * rad * Math.sin(rad * (360 / 365) * (doy - 81));
+  let cosH = -Math.tan(lat * rad) * Math.tan(decl);
+  cosH = Math.max(-1, Math.min(1, cosH));
+  const ha = Math.acos(cosH) / rad;
+
+  const B = rad * (360 / 365) * (doy - 81);
+  const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  const LSTM = 15 * tzOffsetHours;
+  const TC = (4 * (lon - LSTM) + EoT) / 60;
+
   return {
-    spring: new Date(year,2,20),
-    summer: new Date(year,5,21),
-    autumn: new Date(year,8,22),
-    winter: new Date(year,11,21)
+    sunrise: 12 - ha / 15 - TC,
+    sunset:  12 + ha / 15 - TC,
   };
 }
 
-function getEnoch(now){
-  let eq = new Date(now.getFullYear(),2,20);
-  if(now < eq) eq.setFullYear(eq.getFullYear()-1);
-  let diff = Math.floor((now - eq)/86400000) + 1;
-  let doy = ((diff-1)%364) + 1;
-
-  let idx=0, dc=doy;
-  for(let m of months){
-    if(dc <= m) break;
+function getEnoch(now) {
+  let eq = new Date(now.getFullYear(), 2, 20);
+  if (now < eq) eq.setFullYear(eq.getFullYear() - 1);
+  const diff = Math.floor((now - eq) / 86400000) + 1;
+  const doy = ((diff - 1) % 364) + 1;
+  let idx = 0, dc = doy;
+  for (let m of MONTHS) {
+    if (dc <= m) break;
     dc -= m; idx++;
   }
-
-  return {year:7569, day:dc, monthIndex:idx, weekday:((diff-1)%7)+1};
+  const enochYear = 7569 + (eq.getFullYear() - 2025);
+  return { year: enochYear, day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1 };
 }
 
-function drawGrid(enoch){
+function drawClock(now, location) {
+  const canvas = document.getElementById("clockCanvas");
+  const ctx = canvas.getContext("2d");
+  const size = canvas.width;
+  const cx = size / 2, cy = size / 2;
+  const r = cx - 20;
+
+  ctx.clearRect(0, 0, size, size);
+
+  const tzOff = getTZOffsetHours(location.tz);
+  const { sunrise: sr, sunset: ss } = getSunTimes(now, location.lat, location.lon, tzOff);
+
+  const ang = h => (h / 24) * 2 * Math.PI - Math.PI / 2;
+
+  // Day arc
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, r, ang(sr), ang(ss), false);
+  ctx.closePath();
+  ctx.fillStyle = "#f5c842";
+  ctx.fill();
+
+  // Night arc
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, r, ang(ss), ang(sr), false);
+  ctx.closePath();
+  ctx.fillStyle = "#0a1a3a";
+  ctx.fill();
+
+  // Border
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(255,255,255,0.6)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Tick marks
+  for (let i = 0; i < 24; i++) {
+    const a = ang(i);
+    const tickLen = i % 6 === 0 ? 12 : 6;
+    ctx.beginPath();
+    ctx.moveTo(cx + (r - 2) * Math.cos(a), cy + (r - 2) * Math.sin(a));
+    ctx.lineTo(cx + (r - tickLen) * Math.cos(a), cy + (r - tickLen) * Math.sin(a));
+    ctx.strokeStyle = "rgba(255,255,255,0.8)";
+    ctx.lineWidth = i % 6 === 0 ? 2 : 1;
+    ctx.stroke();
+  }
+
+  // Hour numbers
+  ctx.font = "bold 11px Georgia";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i < 24; i++) {
+    const a = ang(i);
+    const nx = cx + (r - 24) * Math.cos(a);
+    const ny = cy + (r - 24) * Math.sin(a);
+    const isDay = i >= sr && i < ss;
+    ctx.fillStyle = isDay ? "#1a1a00" : "white";
+    ctx.fillText(i, nx, ny);
+  }
+
+  // Hour hand
+  const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + r * 0.55 * Math.cos(ang(h)), cy + r * 0.55 * Math.sin(ang(h)));
+  ctx.strokeStyle = "#ff3333";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Minute hand
+  const mAngle = (now.getMinutes() / 60) * 2 * Math.PI - Math.PI / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + r * 0.35 * Math.cos(mAngle), cy + r * 0.35 * Math.sin(mAngle));
+  ctx.strokeStyle = "rgba(255,255,255,0.7)";
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+  ctx.fillStyle = "#ff3333";
+  ctx.fill();
+}
+
+function drawGrid(enoch) {
   const g = document.getElementById("gridContainer");
   g.innerHTML = "";
-  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(d=>{
-    let h = document.createElement("div");
-    h.className="dayHeader";
-    h.textContent=d;
+
+  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(label => {
+    const h = document.createElement("div");
+    h.className = "dayHeader";
+    h.textContent = label;
     g.appendChild(h);
   });
 
-  let base = enoch.monthIndex - enoch.monthIndex%3;
-  for(let i=0; i<3; i++){
-    for(let d=1; d<=months[base+i]; d++){
-      let b=document.createElement("div");
-      b.className="dayBox";
-      if(base+i===enoch.monthIndex && d===enoch.day) b.classList.add("current");
-      b.innerHTML=d+"<br>"+monthAngels[i];
-      g.appendChild(b);
+  const base = enoch.monthIndex - (enoch.monthIndex % 3);
+  for (let i = 0; i < 3; i++) {
+    for (let d = 1; d <= MONTHS[base + i]; d++) {
+      const box = document.createElement("div");
+      box.className = "dayBox" + (base + i === enoch.monthIndex && d === enoch.day ? " current" : "");
+      box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span>`;
+      g.appendChild(box);
     }
   }
 }
 
-function drawClock(now){
-  const c=document.getElementById("clockCanvas");
-  const ctx=c.getContext("2d");
-  const r=c.width/2;
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.translate(r,r);
+function update() {
+  const now = nowInTZ(currentCity.tz);
+  const enoch = getEnoch(now);
 
-  const sun = getSunTimes(now, location.lat, location.lon);
-  const sr = sun.sunrise;
-  const ss = sun.sunset;
+  // Subtitle
+  document.getElementById("subtitle").textContent =
+    `YEAR ${enoch.year} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday}`;
 
-  const ang = h => (h/24)*2*Math.PI - Math.PI/2;
+  // Time display
+  document.getElementById("timeDisplay").textContent = now.toLocaleTimeString();
 
-  // Daylight first (yellow)
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.arc(0,0,r,ang(sr),ang(ss),false);
-  ctx.fillStyle="yellow";
-  ctx.fill();
+  // Solar points
+  const y = now.getFullYear();
+  const fmt = d => d.toLocaleDateString();
+  document.getElementById("solarPoints").innerHTML =
+    `🌅 Spring Eq: ${fmt(new Date(y,2,20))}<br>` +
+    `☀️ Summer Sol: ${fmt(new Date(y,5,21))}<br>` +
+    `🍂 Autumn Eq: ${fmt(new Date(y,8,22))}<br>` +
+    `❄️ Winter Sol: ${fmt(new Date(y,11,21))}`;
 
-  // Night (dark blue)
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.arc(0,0,r,ang(ss),ang(sr),false);
-  ctx.fillStyle="#001f4d";
-  ctx.fill();
+  drawClock(now, currentCity);
+  drawGrid(enoch);
+}
 
-  // Outer border
-  ctx.beginPath();
-  ctx.arc(0,0,r,0,Math.PI*2);
-  ctx.strokeStyle="white";
-  ctx.stroke();
-
-  // Hour hand
-  let h = now.getHours() + now.getMinutes()/60;
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.lineTo(r*0.8*Math.cos(ang(h)), r*0.8*Math.sin(ang(h)));
-  ctx.strokeStyle="red";
-  ctx.lineWidth=3;
-  ctx.stroke();
-
-  // Hour numbers
-  ctx.font="12px Arial";
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
-  for(let i=0;i<24;i++){
-    let a=ang(i);
-    let isDay = (i >= sr && i < ss) || (sr > ss && (i >= sr || i < ss)); // wraparound
-    ctx.fillStyle = isDay ? "black" : "white";
-    ctx.fillText(i, r*0.9*Math.cos(a), r*0.9*Math.sin(a));
+document.getElementById("setCity").addEventListener("click", () => {
+  const val = document.getElementById("cityInput").value.trim().toLowerCase();
+  if (cityDB[val]) {
+    currentCity = cityDB[val];
+    document.getElementById("cityName").textContent = val;
+    document.getElementById("error").textContent = "";
+  } else {
+    document.getElementById("error").textContent =
+      `Unknown city. Try: ${Object.keys(cityDB).join(", ")}`;
   }
-}
+});
 
-function update(){
-  let now = nowTZ(location.tz);
-  let e = getEnoch(now);
-  let solar = getSolarPoints(now.getFullYear());
+document.getElementById("cityInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("setCity").click();
+});
 
-  document.getElementById("clock").innerHTML =
-    "Local Time: "+now.toLocaleString()+
-    "<br>Enoch Year: "+e.year+
-    "<br>Day: "+e.day+
-    "<br>Weekday: "+e.weekday+
-    "<br><br><b>Solar Points</b>"+
-    "<br>Spring Equinox: "+solar.spring.toLocaleDateString()+
-    "<br>Summer Solstice: "+solar.summer.toLocaleDateString()+
-    "<br>Autumn Equinox: "+solar.autumn.toLocaleDateString()+
-    "<br>Winter Solstice: "+solar.winter.toLocaleDateString();
-
-  drawGrid(e);
-  drawClock(now);
-}
-
-setInterval(update,1000);
+setInterval(update, 1000);
 update();
-
-document.getElementById("setCity").onclick = () => {
-  let v = cityInput.value.toLowerCase();
-  if(cityDB[v]) {
-    location = cityDB[v];
-  }
-};
-
-}); // End of DOMContentLoaded
 </script>
-
 </body>
 </html>
