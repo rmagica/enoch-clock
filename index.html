@@ -2,49 +2,58 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Enoch Calendar Visual</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: #080c14; color: white; font-family: Georgia, serif;
   display: flex; flex-direction: column; align-items: center;
-  padding: 30px 20px; min-height: 100vh;
+  padding: 20px 12px; min-height: 100vh; width: 100%;
 }
-h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 18px; margin-bottom: 8px; }
-#subtitle { opacity: 0.4; font-size: 12px; margin-bottom: 8px; letter-spacing: 2px; }
-#gregorian { color: #ff8c00; font-size: 12px; margin-bottom: 24px; letter-spacing: 2px; }
-#controls { display: flex; gap: 8px; margin-bottom: 6px; }
+h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: clamp(14px,4vw,18px); margin-bottom: 8px; text-align: center; }
+#subtitle { opacity: 0.4; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; }
+#gregorian { color: #ff8c00; font-size: clamp(10px,2.5vw,12px); margin-bottom: 16px; letter-spacing: 1px; text-align: center; }
+#controls { display: flex; gap: 8px; margin-bottom: 6px; width: 100%; max-width: 340px; }
 input {
   padding: 8px 12px; background: rgba(255,255,255,0.07);
   border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
-  color: white; font-size: 14px; width: 220px; font-family: Georgia, serif;
+  color: white; font-size: 14px; flex: 1; font-family: Georgia, serif;
 }
 input::placeholder { color: rgba(255,255,255,0.35); }
 button {
   padding: 8px 14px; background: #f5c842; color: #000;
   border: none; border-radius: 6px; cursor: pointer;
-  font-weight: bold; font-family: Georgia, serif; font-size: 14px;
+  font-weight: bold; font-family: Georgia, serif; font-size: 14px; white-space: nowrap;
 }
-#error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; }
-#cityLabel { opacity: 0.5; font-size: 12px; margin-bottom: 12px; }
+#error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; text-align: center; }
+#cityLabel { opacity: 0.5; font-size: 12px; margin-bottom: 12px; text-align: center; }
 #cityLabel strong { color: #f5c842; }
-#debug { font-size: 11px; color: #888; margin-bottom: 16px; font-family: monospace; }
-#mainContainer { display: flex; gap: 48px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
-#clockCol { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-canvas { display: block; border-radius: 50%; }
-#solarPoints { font-size: 12px; opacity: 0.5; text-align: center; line-height: 1.9; }
-#solarDoW { font-size: 11px; opacity: 0.55; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+#debug { font-size: 11px; color: #888; margin-bottom: 16px; font-family: monospace; text-align: center; word-break: break-all; padding: 0 8px; }
+#mainContainer { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; width: 100%; }
+#clockCol { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+canvas { display: block; border-radius: 50%; max-width: 100%; }
+#solarPoints { font-size: clamp(10px,2.5vw,12px); opacity: 0.5; text-align: center; line-height: 1.9; }
+#solarDoW { font-size: clamp(10px,2.5vw,11px); opacity: 0.55; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 #solarDoW .dow-header { color: #ff8c00; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
 #solarDoW .yr-prev { color: #ff8c00; opacity: 0.6; }
 #solarDoW .yr-curr { color: #ff8c00; font-weight: bold; }
 #solarDoW .yr-next { color: #ff8c00; opacity: 0.6; }
-#gridContainer { display: grid; grid-template-columns: repeat(7, 42px); gap: 3px; }
-.dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: 11px; padding: 4px 0; }
+#gridContainer { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; width: 100%; max-width: 320px; }
+.dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
-  width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+  aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.04); color: white;
+  background: rgba(255,255,255,0.04); color: white; font-size: clamp(8px,2vw,10px);
+  position: relative; cursor: default;
 }
+.dayBox .tooltip {
+  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: #222; color: #f5c842; font-size: 10px; white-space: nowrap;
+  padding: 3px 7px; border-radius: 4px; border: 1px solid #f5c842;
+  pointer-events: none; z-index: 10;
+}
+.dayBox:hover .tooltip { display: block; }
 .dayBox.current { border: 2px solid #f5c842; background: #f5c842; color: #000; font-weight: bold; }
 .dayBox.saturday { background: #add8e6; color: #000; border-color: #add8e6; }
 .dayBox { position: relative; cursor: default; }
@@ -73,7 +82,7 @@ canvas { display: block; border-radius: 50%; }
 <div id="debug"></div>
 <div id="mainContainer">
   <div id="clockCol">
-    <canvas id="clockCanvas" width="280" height="280"></canvas>
+    <canvas id="clockCanvas" width="280" height="280" style="width:min(280px,85vw);height:min(280px,85vw)"></canvas>
     <div id="solarPoints"></div>
     <div id="solarDoW"></div>
   </div>
