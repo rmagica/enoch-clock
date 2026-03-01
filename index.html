@@ -11,7 +11,8 @@ body {
   padding: 30px 20px; min-height: 100vh;
 }
 h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 18px; margin-bottom: 8px; }
-#subtitle { opacity: 0.4; font-size: 12px; margin-bottom: 24px; letter-spacing: 2px; }
+#subtitle { opacity: 0.4; font-size: 12px; margin-bottom: 8px; letter-spacing: 2px; }
+#gregorian { color: #ff8c00; font-size: 12px; margin-bottom: 24px; letter-spacing: 2px; }
 #controls { display: flex; gap: 8px; margin-bottom: 6px; }
 input {
   padding: 8px 12px; background: rgba(255,255,255,0.07);
@@ -32,6 +33,11 @@ button {
 #clockCol { display: flex; flex-direction: column; align-items: center; gap: 16px; }
 canvas { display: block; border-radius: 50%; }
 #solarPoints { font-size: 12px; opacity: 0.5; text-align: center; line-height: 1.9; }
+#solarDoW { font-size: 11px; opacity: 0.55; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+#solarDoW .dow-header { color: #ff8c00; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
+#solarDoW .yr-prev { color: #ff8c00; opacity: 0.6; }
+#solarDoW .yr-curr { color: #ff8c00; font-weight: bold; }
+#solarDoW .yr-next { color: #ff8c00; opacity: 0.6; }
 #gridContainer { display: grid; grid-template-columns: repeat(7, 42px); gap: 3px; }
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: 11px; padding: 4px 0; }
 .dayBox {
@@ -41,6 +47,14 @@ canvas { display: block; border-radius: 50%; }
 }
 .dayBox.current { border: 2px solid #f5c842; background: #f5c842; color: #000; font-weight: bold; }
 .dayBox.saturday { background: #add8e6; color: #000; border-color: #add8e6; }
+.dayBox { position: relative; cursor: default; }
+.dayBox .tooltip {
+  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: #222; color: #f5c842; font-size: 10px; white-space: nowrap;
+  padding: 3px 7px; border-radius: 4px; border: 1px solid #f5c842;
+  pointer-events: none; z-index: 10;
+}
+.dayBox:hover .tooltip { display: block; }
 .dayNum { font-size: 13px; }
 .angelLabel { font-size: 7px; opacity: 0.6; }
 </style>
@@ -49,6 +63,7 @@ canvas { display: block; border-radius: 50%; }
 
 <h2>Enoch Calendar</h2>
 <div id="subtitle">...</div>
+<div id="gregorian"></div>
 <div id="controls">
   <input id="cityInput" placeholder="Enter city (e.g. Vancouver)">
   <button id="setCity">Set</button>
@@ -60,6 +75,7 @@ canvas { display: block; border-radius: 50%; }
   <div id="clockCol">
     <canvas id="clockCanvas" width="280" height="280"></canvas>
     <div id="solarPoints"></div>
+    <div id="solarDoW"></div>
   </div>
   <div id="gridContainer"></div>
 </div>
@@ -87,7 +103,16 @@ const CITY_DB = {
   guadalajara: { lat: 20.6597,  lon: -103.3496,  stdOffset: -6,  dst: false },
 };
 
-const MONTHS = [30,30,31,30,30,31,30,30,31,30,30,31];
+// Build month lengths for a given Enoch year start (the March 20 equinox date)
+// Summer Month 2 (index 4) always has 31 days.
+// Winter Month 2 (index 10) has 31 days in Gregorian leap years.
+function getMonths(equinoxYear) {
+  const isLeap = (equinoxYear % 4 === 0 && equinoxYear % 100 !== 0) || equinoxYear % 400 === 0;
+  return [30, 30, 31,  // Spring
+          30, 31, 31,  // Summer (month 2 = 31)
+          30, 30, 31,  // Autumn
+          30, isLeap ? 31 : 30, 31]; // Winter (month 2 = 31 in leap years)
+}
 const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
 let city = CITY_DB.vancouver;
@@ -125,11 +150,13 @@ function getEnoch(utcDate) {
   // Use UTC date to find Enoch position
   let eq = new Date(Date.UTC(utcDate.getUTCFullYear(), 2, 20));
   if (utcDate < eq) eq = new Date(Date.UTC(utcDate.getUTCFullYear() - 1, 2, 20));
+  const MONTHS = getMonths(eq.getUTCFullYear());
+  const yearLen = MONTHS.reduce((a, b) => a + b, 0);
   const diff = Math.floor((utcDate - eq) / 86400000) + 1;
-  const doy  = ((diff - 1) % 364) + 1;
+  const doy  = ((diff - 1) % yearLen) + 1;
   let idx = 0, dc = doy;
   for (const m of MONTHS) { if (dc <= m) break; dc -= m; idx++; }
-  return { year: 7569 + (eq.getUTCFullYear() - 2025), day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1 };
+  return { year: 7569 + (eq.getUTCFullYear() - 2025), day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1, months: MONTHS };
 }
 
 // 24h decimal hour → canvas angle (0h = top, clockwise)
@@ -227,14 +254,28 @@ function drawClock(cityDate, tzOff) {
   ctx.fillStyle = "#ff3333"; ctx.fill();
 }
 
-function drawGrid(enoch) {
+function drawGrid(enoch, springEqDate) {
   const g = document.getElementById("gridContainer");
   g.innerHTML = "";
-  for (const lbl of ["SUN","MON","TUE","WED","THU","FRI","SAT"]) {
+  // Map each Enoch weekday column to its Gregorian equivalent for this year
+  const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  const eqOffset = springEqDate.getUTCDay(); // Gregorian DoW of spring equinox = Enoch day 1
+  const ENOCH_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  for (let i = 0; i < 7; i++) {
+    const gName = G_WD[(eqOffset + i) % 7];
     const h = document.createElement("div");
-    h.className = "dayHeader"; h.textContent = lbl; g.appendChild(h);
+    h.className = "dayHeader";
+    const isSatCol = (i === 6);
+    const headerColor = isSatCol ? "#4da6ff" : "#f5c842";
+    const subColor = isSatCol ? "#4da6ff" : "#ff8c00";
+    h.innerHTML = `<span style="color:${headerColor}">${ENOCH_WD[i]}</span><br><span style="font-size:9px;color:${subColor};font-weight:normal">${gName}</span>`;
+    g.appendChild(h);
   }
+  const MONTHS = enoch.months;
   const base = enoch.monthIndex - (enoch.monthIndex % 3);
+  // Count days from spring equinox to the start of this quarter
+  let daysBeforeQuarter = 0;
+  for (let m = 0; m < base; m++) daysBeforeQuarter += MONTHS[m];
   let col = 0;
   for (let i = 0; i < 3; i++) {
     for (let d = 1; d <= MONTHS[base + i]; d++) {
@@ -242,7 +283,11 @@ function drawGrid(enoch) {
       const isCurrent = (base + i === enoch.monthIndex && d === enoch.day);
       const isSat = (col % 7 === 6);
       box.className = "dayBox" + (isCurrent ? " current" : (isSat ? " saturday" : ""));
-      box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span>`;
+      // Gregorian date = spring equinox + days before this quarter + position within quarter
+      const gregDate = new Date(springEqDate.getTime() + (daysBeforeQuarter + col) * 86400000);
+      const G_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const gregStr = gregDate.getUTCDate() + " " + G_MONTHS[gregDate.getUTCMonth()];
+      box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span><span class="tooltip">${gregStr}</span>`;
       g.appendChild(box);
       col++;
     }
@@ -262,17 +307,98 @@ function update() {
   const ss = String(cityDate.getUTCSeconds()).padStart(2,"0");
 
   const WD_NAMES = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  const GREG_MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+  // Season: based on monthIndex (0-11), each group of 3 = one season
+  const SEASONS = ["SPRING","SUMMER","AUTUMN","WINTER"];
+  const SEASON_ROMAN = ["I","II","III"];
+  const seasonIdx = Math.floor(enoch.monthIndex / 3);       // 0-3
+  const monthInSeason = enoch.monthIndex % 3;               // 0-2
+  const seasonLabel = SEASONS[seasonIdx] + " " + SEASON_ROMAN[monthInSeason];
+
   document.getElementById("subtitle").textContent =
-    `YEAR ${enoch.year} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday} (${WD_NAMES[enoch.weekday-1]})`;
+    `YEAR ${enoch.year} · ${seasonLabel} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday} (${WD_NAMES[enoch.weekday-1]})`;
+
+  // Gregorian line — use cityDate for local date
+  const gregWD = WD_NAMES[cityDate.getUTCDay()];
+  const gregMon = GREG_MONTHS[cityDate.getUTCMonth()];
+  document.getElementById("gregorian").textContent =
+    `G-YEAR ${cityDate.getUTCFullYear()} · ${gregMon} · ${cityDate.getUTCDate()} · ${gregWD}`;
   document.getElementById("timeDisplay").textContent = `${hh}:${mm}:${ss}`;
+  // Jean Meeus algorithm for equinox/solstice times, accurate to ~minutes for any year
+  // Returns a Date object in UTC
+  function solarEventUTC(year, which) {
+    // which: 0=spring, 1=summer, 2=autumn, 3=winter
+    const Y = (year - 2000) / 1000;
+    // JDE estimates for each event (Tables 27.a/27.b from Meeus)
+    const JDE0s = [
+      2451623.80984 + 365242.37404*Y + 0.05169*Y*Y - 0.00411*Y*Y*Y - 0.00057*Y*Y*Y*Y,
+      2451716.56767 + 365241.62603*Y + 0.00325*Y*Y + 0.00888*Y*Y*Y - 0.00030*Y*Y*Y*Y,
+      2451810.21715 + 365242.01767*Y - 0.11575*Y*Y + 0.00337*Y*Y*Y + 0.00078*Y*Y*Y*Y,
+      2451900.05952 + 365242.74049*Y - 0.06223*Y*Y - 0.00823*Y*Y*Y + 0.00032*Y*Y*Y*Y,
+    ];
+    let JDE = JDE0s[which];
+    // Correction terms
+    const T = (JDE - 2451545) / 36525;
+    const W = 35999.373*T - 2.47;
+    const dL = 1 + 0.0334*Math.cos(W*Math.PI/180) + 0.0007*Math.cos(2*W*Math.PI/180);
+    // Periodic terms (abridged from Meeus Table 27.c)
+    const terms = [
+      [485,324.96,1934.136],[203,337.23,32964.467],[199,342.08,20.186],
+      [182,27.85,445267.112],[156,73.14,45036.886],[136,171.52,22518.443],
+      [77,222.54,65928.934],[74,296.72,3034.906],[70,243.58,9037.513],
+      [58,119.81,33718.147],[52,297.17,150.678],[50,21.02,2281.226],
+      [45,247.54,29929.562],[44,325.15,31555.956],[29,60.93,4443.417],
+      [18,155.12,67555.328],[17,288.79,4562.452],[16,198.04,62894.029],
+      [14,199.76,31557.370],[12,95.39,14577.848],[10,49.11,31071.843],
+      [10,165.57,628.302],[10,146.57,20199.711],[10,110.02,16859.074]
+    ];
+    let S = 0;
+    for (const [a, b, cc] of terms) {
+      S += a * Math.cos((b + cc * T) * Math.PI / 180);
+    }
+    JDE += S * 0.00001 / dL;
+    // Convert JDE to Unix timestamp (ms)
+    return new Date((JDE - 2440587.5) * 86400000);
+  }
+
+  function fmtSolarLocal(utcDate, cityTzOff) {
+    const local = new Date(utcDate.getTime() + cityTzOff * 3600000);
+    const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const G_WD_LONG = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const dow = G_WD_LONG[local.getUTCDay()];
+    const mo  = MONTHS_LONG[local.getUTCMonth()];
+    const dy  = local.getUTCDate();
+    const hh  = String(local.getUTCHours()).padStart(2,"0");
+    const mm  = String(local.getUTCMinutes()).padStart(2,"0");
+    return `${dow} ${mo} ${dy}  ${hh}:${mm}`;
+  }
+
+  const solarTzOff = getCityOffset(city);
   document.getElementById("solarPoints").innerHTML =
-    `🌅 Spring Eq: ${new Date(yr,2,20).toLocaleDateString()}<br>` +
-    `☀️ Summer Sol: ${new Date(yr,5,21).toLocaleDateString()}<br>` +
-    `🍂 Autumn Eq: ${new Date(yr,8,22).toLocaleDateString()}<br>` +
-    `❄️ Winter Sol: ${new Date(yr,11,21).toLocaleDateString()}`;
+    `🌅 Spring Eq: ${fmtSolarLocal(solarEventUTC(yr, 0), solarTzOff)}<br>` +
+    `☀️ Summer Sol: ${fmtSolarLocal(solarEventUTC(yr, 1), solarTzOff)}<br>` +
+    `🍂 Autumn Eq: ${fmtSolarLocal(solarEventUTC(yr, 2), solarTzOff)}<br>` +
+    `❄️ Winter Sol: ${fmtSolarLocal(solarEventUTC(yr, 3), solarTzOff)}`;
+
+  // Sabbath DoW: Enoch day 7 = spring equinox + 6 days, show G-DoW for prev/curr/next year
+  const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  function sabbathGDoW(year) {
+    const eq = solarEventUTC(year, 0);
+    const sabbath = new Date(eq.getTime() + 6 * 86400000);
+    return G_WD[sabbath.getUTCDay()];
+  }
+  const prevYr = yr - 1, nextYr = yr + 1;
+  document.getElementById("solarDoW").innerHTML =
+    `<div class="dow-header">SABBATH (Gregorian DoW)</div>` +
+    `<span class="yr-prev">${prevYr}: ${sabbathGDoW(prevYr)}</span> · ` +
+    `<span class="yr-curr">${yr}: ${sabbathGDoW(yr)}</span> · ` +
+    `<span class="yr-next">${nextYr}: ${sabbathGDoW(nextYr)}</span>`;
 
   drawClock(cityDate, tzOff);
-  drawGrid(enoch);
+  // Spring equinox UTC date for this Enoch year (used for G-DoW mapping in grid)
+  const springEqForGrid = solarEventUTC(yr, 0);
+  drawGrid(enoch, springEqForGrid);
 }
 
 document.getElementById("setCity").addEventListener("click", () => {
