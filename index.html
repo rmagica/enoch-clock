@@ -4,136 +4,57 @@
 <meta charset="UTF-8">
 <title>Enoch Calendar Visual</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #080c14;
-    color: white;
-    font-family: Georgia, serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px 20px;
-    min-height: 100vh;
-  }
-  h2 {
-    letter-spacing: 4px;
-    color: #f5c842;
-    text-transform: uppercase;
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-  #subtitle {
-    opacity: 0.4;
-    font-size: 12px;
-    margin-bottom: 24px;
-    letter-spacing: 2px;
-  }
-  #controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-  input {
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    color: white;
-    font-size: 14px;
-    width: 220px;
-    font-family: Georgia, serif;
-  }
-  input::placeholder { color: rgba(255,255,255,0.35); }
-  button {
-    padding: 8px 14px;
-    background: #f5c842;
-    color: #000;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: Georgia, serif;
-    font-size: 14px;
-  }
-  button:hover { background: #ffd85a; }
-  #error { color: #ff6666; font-size: 12px; margin-bottom: 8px; min-height: 18px; }
-  #cityLabel {
-    opacity: 0.5;
-    font-size: 12px;
-    margin-bottom: 28px;
-  }
-  #cityLabel strong { color: #f5c842; }
-  #mainContainer {
-    display: flex;
-    gap: 48px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  #clockCol {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  canvas {
-    border-radius: 50%;
-    background: #111;
-    display: block;
-  }
-  #solarPoints {
-    font-size: 12px;
-    opacity: 0.5;
-    text-align: center;
-    line-height: 1.9;
-  }
-  #gridContainer {
-    display: grid;
-    grid-template-columns: repeat(7, 42px);
-    gap: 3px;
-  }
-  .dayHeader {
-    color: #f5c842;
-    font-weight: bold;
-    text-align: center;
-    font-size: 11px;
-    padding: 4px 0;
-  }
-  .dayBox {
-    width: 42px;
-    height: 42px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    background: rgba(255,255,255,0.04);
-    color: white;
-  }
-  .dayBox.current {
-    border: 2px solid #f5c842;
-    background: #f5c842;
-    color: #000;
-    font-weight: bold;
-  }
-  .dayBox .dayNum { font-size: 13px; }
-  .dayBox .angelLabel { font-size: 7px; opacity: 0.6; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #080c14; color: white; font-family: Georgia, serif;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 30px 20px; min-height: 100vh;
+}
+h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 18px; margin-bottom: 8px; }
+#subtitle { opacity: 0.4; font-size: 12px; margin-bottom: 24px; letter-spacing: 2px; }
+#controls { display: flex; gap: 8px; margin-bottom: 6px; }
+input {
+  padding: 8px 12px; background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+  color: white; font-size: 14px; width: 220px; font-family: Georgia, serif;
+}
+input::placeholder { color: rgba(255,255,255,0.35); }
+button {
+  padding: 8px 14px; background: #f5c842; color: #000;
+  border: none; border-radius: 6px; cursor: pointer;
+  font-weight: bold; font-family: Georgia, serif; font-size: 14px;
+}
+#error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; }
+#cityLabel { opacity: 0.5; font-size: 12px; margin-bottom: 12px; }
+#cityLabel strong { color: #f5c842; }
+#debug { font-size: 11px; color: #888; margin-bottom: 16px; font-family: monospace; }
+#mainContainer { display: flex; gap: 48px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+#clockCol { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+canvas { display: block; border-radius: 50%; }
+#solarPoints { font-size: 12px; opacity: 0.5; text-align: center; line-height: 1.9; }
+#gridContainer { display: grid; grid-template-columns: repeat(7, 42px); gap: 3px; }
+.dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: 11px; padding: 4px 0; }
+.dayBox {
+  width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.04); color: white;
+}
+.dayBox.current { border: 2px solid #f5c842; background: #f5c842; color: #000; font-weight: bold; }
+.dayNum { font-size: 13px; }
+.angelLabel { font-size: 7px; opacity: 0.6; }
 </style>
 </head>
 <body>
 
 <h2>Enoch Calendar</h2>
-<div id="subtitle">YEAR · DAY · WEEKDAY</div>
-
+<div id="subtitle">...</div>
 <div id="controls">
   <input id="cityInput" placeholder="Enter city (e.g. Vancouver)">
   <button id="setCity">Set</button>
 </div>
 <div id="error"></div>
-<div id="cityLabel">Currently: <strong id="cityName">vancouver</strong> · <span id="timeDisplay"></span></div>
-
+<div id="cityLabel">City: <strong id="cityName">vancouver</strong> &nbsp;|&nbsp; <span id="timeDisplay"></span></div>
+<div id="debug"></div>
 <div id="mainContainer">
   <div id="clockCol">
     <canvas id="clockCanvas" width="280" height="280"></canvas>
@@ -143,167 +64,180 @@
 </div>
 
 <script>
-const cityDB = {
-  vancouver:   { lat: 49.2827,  lon: -123.1207, tz: "America/Vancouver" },
-  hawaii:      { lat: 21.3069,  lon: -157.8583, tz: "Pacific/Honolulu" },
-  guadalajara: { lat: 20.6597,  lon: -103.3496, tz: "America/Mexico_City" },
+"use strict";
+
+// US/Canada DST: starts 2nd Sunday of March, ends 1st Sunday of November
+function isDST(utcDate, observesDST) {
+  if (!observesDST) return false;
+  const yr = utcDate.getUTCFullYear();
+  // 2nd Sunday of March
+  const mar1  = new Date(Date.UTC(yr, 2, 1));
+  const dstStart = new Date(Date.UTC(yr, 2, 1 + (7 - mar1.getUTCDay()) % 7 + 7, 2));
+  // 1st Sunday of November
+  const nov1  = new Date(Date.UTC(yr, 10, 1));
+  const dstEnd = new Date(Date.UTC(yr, 10, 1 + (7 - nov1.getUTCDay()) % 7, 2));
+  return utcDate >= dstStart && utcDate < dstEnd;
+}
+
+// City DB: stdOffset = UTC offset in standard time, dst = observes DST
+const CITY_DB = {
+  vancouver:   { lat: 49.2827,  lon: -123.1207, stdOffset: -8,  dst: true  },
+  hawaii:      { lat: 21.3069,  lon: -157.8583,  stdOffset: -10, dst: false },
+  guadalajara: { lat: 20.6597,  lon: -103.3496,  stdOffset: -6,  dst: false },
 };
 
 const MONTHS = [30,30,31,30,30,31,30,30,31,30,30,31];
 const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
-let currentCity = cityDB.vancouver;
+let city = CITY_DB.vancouver;
 
-function nowInTZ(tz) {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+function getCityTime(c) {
+  const utcNow = new Date();
+  const offset = c.stdOffset + (isDST(utcNow, c.dst) ? 1 : 0);
+  // Create a date whose getHours()/getMinutes() reflect city local time
+  return new Date(utcNow.getTime() + offset * 3600000);
 }
 
-function getTZOffsetHours(tz) {
-  const now = new Date();
-  const local = new Date(now.toLocaleString("en-US", { timeZone: tz }));
-  return (local - now) / 3600000;
+function getCityOffset(c) {
+  const utcNow = new Date();
+  return c.stdOffset + (isDST(utcNow, c.dst) ? 1 : 0);
 }
 
-function getSunTimes(date, lat, lon, tzOffsetHours) {
-  const rad = Math.PI / 180;
-  const start = new Date(date.getFullYear(), 0, 1);
-  const doy = Math.round((date - start) / 86400000) + 1;
+function sunTimes(date, lat, lon, tzOff) {
+  const RAD  = Math.PI / 180;
+  const jan1 = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const doy  = Math.round((date - jan1) / 86400000) + 1;
 
-  const decl = 23.45 * rad * Math.sin(rad * (360 / 365) * (doy - 81));
-  let cosH = -Math.tan(lat * rad) * Math.tan(decl);
-  cosH = Math.max(-1, Math.min(1, cosH));
-  const ha = Math.acos(cosH) / rad;
+  const decl = 23.45 * RAD * Math.sin(RAD * (360 / 365) * (doy - 81));
+  let cosH   = -Math.tan(lat * RAD) * Math.tan(decl);
+  cosH       = Math.max(-1, Math.min(1, cosH));
+  const ha   = Math.acos(cosH) / RAD;
 
-  const B = rad * (360 / 365) * (doy - 81);
+  const B   = RAD * (360 / 365) * (doy - 81);
   const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-  const LSTM = 15 * tzOffsetHours;
-  const TC = (4 * (lon - LSTM) + EoT) / 60;
+  const TC  = (4 * (lon - 15 * tzOff) + EoT) / 60;
 
-  return {
-    sunrise: 12 - ha / 15 - TC,
-    sunset:  12 + ha / 15 - TC,
-  };
+  return { sunrise: 12 - ha / 15 - TC, sunset: 12 + ha / 15 - TC };
 }
 
-function getEnoch(now) {
-  let eq = new Date(now.getFullYear(), 2, 20);
-  if (now < eq) eq.setFullYear(eq.getFullYear() - 1);
-  const diff = Math.floor((now - eq) / 86400000) + 1;
-  const doy = ((diff - 1) % 364) + 1;
+function getEnoch(utcDate) {
+  // Use UTC date to find Enoch position
+  let eq = new Date(Date.UTC(utcDate.getUTCFullYear(), 2, 20));
+  if (utcDate < eq) eq = new Date(Date.UTC(utcDate.getUTCFullYear() - 1, 2, 20));
+  const diff = Math.floor((utcDate - eq) / 86400000) + 1;
+  const doy  = ((diff - 1) % 364) + 1;
   let idx = 0, dc = doy;
-  for (let m of MONTHS) {
-    if (dc <= m) break;
-    dc -= m; idx++;
-  }
-  const enochYear = 7569 + (eq.getFullYear() - 2025);
-  return { year: enochYear, day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1 };
+  for (const m of MONTHS) { if (dc <= m) break; dc -= m; idx++; }
+  return { year: 7569 + (eq.getUTCFullYear() - 2025), day: dc, monthIndex: idx, weekday: ((diff - 1) % 7) + 1 };
 }
 
-function drawClock(now, location) {
+// 24h decimal hour → canvas angle (0h = top, clockwise)
+function toAngle(h) {
+  return (h / 24) * 2 * Math.PI - Math.PI / 2;
+}
+
+function drawClock(cityDate, tzOff) {
   const canvas = document.getElementById("clockCanvas");
-  const ctx = canvas.getContext("2d");
-  const size = canvas.width;
-  const cx = size / 2, cy = size / 2;
-  const r = cx - 20;
+  const ctx    = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2, R = cx - 18;
 
-  ctx.clearRect(0, 0, size, size);
+  ctx.clearRect(0, 0, W, H);
 
-  const tzOff = getTZOffsetHours(location.tz);
-  const { sunrise: sr, sunset: ss } = getSunTimes(now, location.lat, location.lon, tzOff);
+  // cityDate is a UTC Date whose getUTCHours()/getUTCMinutes() = local city time
+  const localH = cityDate.getUTCHours();
+  const localM = cityDate.getUTCMinutes();
+  const localS = cityDate.getUTCSeconds();
 
-  const ang = h => (h / 24) * 2 * Math.PI - Math.PI / 2;
+  const { sunrise: SR, sunset: SS } = sunTimes(new Date(), city.lat, city.lon, tzOff);
 
-  // Day arc
+  document.getElementById("debug").textContent =
+    `sunrise=${SR.toFixed(2)}h  sunset=${SS.toFixed(2)}h  tzOff=${tzOff}  ` +
+    `localTime=${localH}:${String(localM).padStart(2,"0")}`;
+
+  // 1. Full circle = NIGHT (dark blue)
   ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.arc(cx, cy, r, ang(sr), ang(ss), false);
-  ctx.closePath();
-  ctx.fillStyle = "#f5c842";
-  ctx.fill();
-
-  // Night arc
-  ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  ctx.arc(cx, cy, r, ang(ss), ang(sr), false);
-  ctx.closePath();
+  ctx.arc(cx, cy, R, 0, 2 * Math.PI);
   ctx.fillStyle = "#0a1a3a";
   ctx.fill();
 
-  // Border
+  // 2. DAY wedge (sunrise→sunset clockwise), clipped to circle
+  ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.strokeStyle = "rgba(255,255,255,0.6)";
+  ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+  ctx.clip();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, R, toAngle(SR), toAngle(SS), false);
+  ctx.closePath();
+  ctx.fillStyle = "#f5c842";
+  ctx.fill();
+  ctx.restore();
+
+  // 3. Border
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Tick marks
+  // 4. Tick marks
   for (let i = 0; i < 24; i++) {
-    const a = ang(i);
-    const tickLen = i % 6 === 0 ? 12 : 6;
+    const a = toAngle(i), len = i % 6 === 0 ? 11 : 5;
     ctx.beginPath();
-    ctx.moveTo(cx + (r - 2) * Math.cos(a), cy + (r - 2) * Math.sin(a));
-    ctx.lineTo(cx + (r - tickLen) * Math.cos(a), cy + (r - tickLen) * Math.sin(a));
-    ctx.strokeStyle = "rgba(255,255,255,0.8)";
-    ctx.lineWidth = i % 6 === 0 ? 2 : 1;
+    ctx.moveTo(cx + (R - 1)   * Math.cos(a), cy + (R - 1)   * Math.sin(a));
+    ctx.lineTo(cx + (R - len) * Math.cos(a), cy + (R - len) * Math.sin(a));
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth   = i % 6 === 0 ? 2 : 1;
     ctx.stroke();
   }
 
-  // Hour numbers
-  ctx.font = "bold 11px Georgia";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  // 5. Hour numbers (0–23, 24h face)
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "bold 10px Georgia";
   for (let i = 0; i < 24; i++) {
-    const a = ang(i);
-    const nx = cx + (r - 24) * Math.cos(a);
-    const ny = cy + (r - 24) * Math.sin(a);
-    const isDay = i >= sr && i < ss;
-    ctx.fillStyle = isDay ? "#1a1a00" : "white";
-    ctx.fillText(i, nx, ny);
+    const a = toAngle(i);
+    const x = cx + (R - 22) * Math.cos(a);
+    const y = cy + (R - 22) * Math.sin(a);
+    ctx.fillStyle = (i >= SR && i < SS) ? "#1a1200" : "#ffffff";
+    ctx.fillText(i, x, y);
   }
 
-  // Hour hand
-  const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+  // 6. Hour hand
+  const hVal = localH + localM / 60 + localS / 3600;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + r * 0.55 * Math.cos(ang(h)), cy + r * 0.55 * Math.sin(ang(h)));
-  ctx.strokeStyle = "#ff3333";
-  ctx.lineWidth = 3;
-  ctx.lineCap = "round";
+  ctx.lineTo(cx + R * 0.54 * Math.cos(toAngle(hVal)), cy + R * 0.54 * Math.sin(toAngle(hVal)));
+  ctx.strokeStyle = "#ff3333"; ctx.lineWidth = 3; ctx.lineCap = "round";
   ctx.stroke();
 
-  // Minute hand
-  const mAngle = (now.getMinutes() / 60) * 2 * Math.PI - Math.PI / 2;
+  // 7. Minute hand (position on 24h face)
+  const totalMins = localH * 60 + localM + localS / 60;
+  const mAngle    = (totalMins / 1440) * 2 * Math.PI - Math.PI / 2;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
-  ctx.lineTo(cx + r * 0.35 * Math.cos(mAngle), cy + r * 0.35 * Math.sin(mAngle));
-  ctx.strokeStyle = "rgba(255,255,255,0.7)";
-  ctx.lineWidth = 2;
-  ctx.lineCap = "round";
+  ctx.lineTo(cx + R * 0.72 * Math.cos(mAngle), cy + R * 0.72 * Math.sin(mAngle));
+  ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = 1.5; ctx.lineCap = "round";
   ctx.stroke();
 
-  // Center dot
+  // 8. Centre dot
   ctx.beginPath();
-  ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-  ctx.fillStyle = "#ff3333";
-  ctx.fill();
+  ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
+  ctx.fillStyle = "#ff3333"; ctx.fill();
 }
 
 function drawGrid(enoch) {
   const g = document.getElementById("gridContainer");
   g.innerHTML = "";
-
-  ["SUN","MON","TUE","WED","THU","FRI","SAT"].forEach(label => {
+  for (const lbl of ["SUN","MON","TUE","WED","THU","FRI","SAT"]) {
     const h = document.createElement("div");
-    h.className = "dayHeader";
-    h.textContent = label;
-    g.appendChild(h);
-  });
-
+    h.className = "dayHeader"; h.textContent = lbl; g.appendChild(h);
+  }
   const base = enoch.monthIndex - (enoch.monthIndex % 3);
   for (let i = 0; i < 3; i++) {
     for (let d = 1; d <= MONTHS[base + i]; d++) {
       const box = document.createElement("div");
-      box.className = "dayBox" + (base + i === enoch.monthIndex && d === enoch.day ? " current" : "");
+      box.className = "dayBox" + ((base + i === enoch.monthIndex && d === enoch.day) ? " current" : "");
       box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span>`;
       g.appendChild(box);
     }
@@ -311,41 +245,40 @@ function drawGrid(enoch) {
 }
 
 function update() {
-  const now = nowInTZ(currentCity.tz);
-  const enoch = getEnoch(now);
+  const utcNow   = new Date();
+  const tzOff    = getCityOffset(city);
+  // Shift UTC time by tzOff hours; read result via getUTC* methods = local city time
+  const cityDate = new Date(utcNow.getTime() + tzOff * 3600000);
+  const enoch    = getEnoch(utcNow);
+  const yr       = cityDate.getUTCFullYear();
 
-  // Subtitle
+  const hh = String(cityDate.getUTCHours()).padStart(2,"0");
+  const mm = String(cityDate.getUTCMinutes()).padStart(2,"0");
+  const ss = String(cityDate.getUTCSeconds()).padStart(2,"0");
+
   document.getElementById("subtitle").textContent =
     `YEAR ${enoch.year} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday}`;
-
-  // Time display
-  document.getElementById("timeDisplay").textContent = now.toLocaleTimeString();
-
-  // Solar points
-  const y = now.getFullYear();
-  const fmt = d => d.toLocaleDateString();
+  document.getElementById("timeDisplay").textContent = `${hh}:${mm}:${ss}`;
   document.getElementById("solarPoints").innerHTML =
-    `🌅 Spring Eq: ${fmt(new Date(y,2,20))}<br>` +
-    `☀️ Summer Sol: ${fmt(new Date(y,5,21))}<br>` +
-    `🍂 Autumn Eq: ${fmt(new Date(y,8,22))}<br>` +
-    `❄️ Winter Sol: ${fmt(new Date(y,11,21))}`;
+    `🌅 Spring Eq: ${new Date(yr,2,20).toLocaleDateString()}<br>` +
+    `☀️ Summer Sol: ${new Date(yr,5,21).toLocaleDateString()}<br>` +
+    `🍂 Autumn Eq: ${new Date(yr,8,22).toLocaleDateString()}<br>` +
+    `❄️ Winter Sol: ${new Date(yr,11,21).toLocaleDateString()}`;
 
-  drawClock(now, currentCity);
+  drawClock(cityDate, tzOff);
   drawGrid(enoch);
 }
 
 document.getElementById("setCity").addEventListener("click", () => {
-  const val = document.getElementById("cityInput").value.trim().toLowerCase();
-  if (cityDB[val]) {
-    currentCity = cityDB[val];
-    document.getElementById("cityName").textContent = val;
+  const key = document.getElementById("cityInput").value.trim().toLowerCase();
+  if (CITY_DB[key]) {
+    city = CITY_DB[key];
+    document.getElementById("cityName").textContent = key;
     document.getElementById("error").textContent = "";
   } else {
-    document.getElementById("error").textContent =
-      `Unknown city. Try: ${Object.keys(cityDB).join(", ")}`;
+    document.getElementById("error").textContent = "Unknown city. Try: " + Object.keys(CITY_DB).join(", ");
   }
 });
-
 document.getElementById("cityInput").addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("setCity").click();
 });
