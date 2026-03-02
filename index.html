@@ -9,12 +9,45 @@
 body {
   background: #080c14; color: white; font-family: Georgia, serif;
   display: flex; flex-direction: column; align-items: center;
-  padding: 20px 12px; min-height: 100vh; width: 100%;
+  padding: 0 12px 20px; min-height: 100vh; width: 100%;
 }
-h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: clamp(14px,4vw,18px); margin-bottom: 8px; text-align: center; }
-#subtitle { opacity: 0.85; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; white-space: pre-line; }
-#gregorian { color: #4da6ff; font-size: clamp(10px,2.5vw,12px); margin-bottom: 16px; letter-spacing: 1px; text-align: center; }
-#controls { display: flex; gap: 8px; margin-bottom: 6px; width: 100%; max-width: 340px; }
+/* Fixed header — title + Enoch/Greg date lines */
+#fixedHeader {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: #080c14; border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 12px 6px;
+}
+#pageContent { margin-top: 80px; width: 100%; }
+h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: clamp(14px,4vw,18px); margin-bottom: 4px; text-align: center; }
+#subtitle { opacity: 0.85; font-size: clamp(10px,2.5vw,12px); margin-bottom: 2px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; white-space: pre-line; }
+#gregorian { color: #4da6ff; font-size: clamp(10px,2.5vw,12px); margin-bottom: 0; letter-spacing: 1px; text-align: center; }
+/* Mobile: everything centred in a column */
+#mainContainer {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; width: 100%; padding-top: 8px;
+}
+/* Desktop 3-column layout */
+@media (min-width: 900px) {
+  #mainContainer {
+    flex-direction: row; align-items: flex-start;
+    justify-content: center; gap: 24px;
+  }
+  #clockCol  { width: 260px; flex-shrink: 0; }
+  #feastCol  { width: 240px; flex-shrink: 0; }
+  #gridWrapper { flex-shrink: 0; }
+}
+/* Clock column */
+#clockCol { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 100%; max-width: 320px; }
+/* City controls — left-aligned text on desktop, centred on mobile */
+#cityControls { display: flex; flex-direction: column; align-items: stretch; gap: 2px; width: 100%; }
+#controls { display: flex; gap: 8px; width: 100%; }
+#error { color: #ff6666; font-size: 12px; min-height: 16px; }
+#cityLabel { opacity: 0.85; font-size: 12px; }
+#cityLabel strong { color: #f5c842; }
+#debug { font-size: 11px; color: rgba(255,255,255,0.7); font-family: monospace; word-break: normal; overflow-wrap: normal; white-space: pre-wrap; }
+/* Canvas: always a perfect square, scales to container width */
+#clockCanvas { display: block; width: 100%; aspect-ratio: 1 / 1; border-radius: 50%; }
 input {
   padding: 8px 12px; background: rgba(255,255,255,0.07);
   border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
@@ -26,19 +59,18 @@ button {
   border: none; border-radius: 6px; cursor: pointer;
   font-weight: bold; font-family: Georgia, serif; font-size: 14px; white-space: nowrap;
 }
-#error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; text-align: center; }
-#cityLabel { opacity: 0.85; font-size: 12px; margin-bottom: 12px; text-align: center; }
-#cityLabel strong { color: #f5c842; }
-#debug { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 16px; font-family: monospace; text-align: center; word-break: normal; overflow-wrap: normal; white-space: pre-wrap; padding: 0 8px; }
-#mainContainer { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; width: 100%; }
-#clockCol { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-canvas { display: block; max-width: 100%; }
+#feastCol { display: flex; flex-direction: column; width: 100%; max-width: 320px; }
+#feastSidebar { margin-top: 0; border-top: none; padding-top: 0; }
 #solarPoints { font-size: clamp(10px,2.5vw,12px); opacity: 0.85; text-align: center; line-height: 1.9; }
 #solarDoW { font-size: clamp(10px,2.5vw,11px); opacity: 0.85; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
-#solarDoW .dow-header { color: #4da6ff; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
-#solarDoW .yr-prev { color: #4da6ff; opacity: 0.6; }
-#solarDoW .yr-curr { color: #4da6ff; font-weight: bold; }
-#solarDoW .yr-next { color: #4da6ff; opacity: 0.6; }
+#solarDoW .dow-header { color: #4da6ff; font-size: 10px; letter-spacing: 1px; margin-bottom: 6px; }
+#solarDoW .sabbath-carousel { display: flex; align-items: center; justify-content: center; gap: 6px; }
+#solarDoW .sab-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 14px; border-radius: 4px; cursor: pointer; padding: 1px 7px; line-height: 1; user-select: none; }
+#solarDoW .sab-btn:hover { background: rgba(255,255,255,0.18); }
+#solarDoW .sab-rows { display: flex; flex-direction: column; gap: 1px; }
+#solarDoW .yr-item { color: #4da6ff; }
+#solarDoW .yr-item.is-current { font-weight: bold; }
+#solarDoW .yr-item.is-adjacent { opacity: 0.6; }
 #gridWrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 #gridHeading { text-align: center; line-height: 1.7; }
 #gridHeading .season-name { font-size: clamp(13px,3vw,16px); font-weight: bold; color: #f5c842; letter-spacing: 3px; text-transform: uppercase; }
@@ -53,7 +85,16 @@ canvas { display: block; max-width: 100%; }
   padding: 6px 10px; flex-shrink: 0; user-select: none; line-height: 1;
 }
 .arrow-btn:hover { background: rgba(255,255,255,0.18); }
-#gridContainer { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 350px; }
+#gridContainer {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px; width: 100%;
+  max-width: 350px;
+}
+@media (min-width: 900px) {
+  #gridContainer { gap: 3px; max-width: 420px; }
+  .dayBox { font-size: 9px; }
+  .dayNum { font-size: 11px; }
+}
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
   aspect-ratio: 1; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
@@ -94,29 +135,47 @@ canvas { display: block; max-width: 100%; }
   display: none; position: fixed; z-index: 100;
   background: #1a1a2e; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
   padding: 6px 10px; font-size: 10px; font-style: italic; color: rgba(255,255,255,0.8);
-  width: 220px; line-height: 1.5; pointer-events: none;
+  width: 220px; line-height: 1.5; pointer-events: auto;
 }
 </style>
 </head>
 <body>
 
-<h2>Enoch Calendar</h2>
-<div id="subtitle">...</div>
-<div id="gregorian"></div>
-<div id="controls">
-  <input id="cityInput" placeholder="Any city worldwide…">
-  <button id="setCity">Set</button>
+<div id="fixedHeader">
+  <h2>Enoch Calendar</h2>
+  <div id="subtitle">...</div>
+  <div id="gregorian"></div>
 </div>
-<div id="error"></div>
-<div id="cityLabel">City: <strong id="cityName">Vancouver</strong> &nbsp;|&nbsp; <span id="timeDisplay"></span></div>
-<div id="debug"></div>
+
+<div id="pageContent">
 <div id="mainContainer">
+  <!-- Col 1: City search area already above, clock + solar info -->
   <div id="clockCol">
-    <canvas id="clockCanvas" style="width:min(280px,85vw);height:min(280px,85vw);border-radius:50%"></canvas>
+    <div id="cityControls">
+      <div id="controls">
+        <input id="cityInput" placeholder="Any city worldwide…">
+        <button id="setCity">Set</button>
+      </div>
+      <div id="error"></div>
+      <div id="cityLabel">City: <strong id="cityName">Vancouver</strong> &nbsp;|&nbsp; <span id="timeDisplay"></span></div>
+      <div id="debug"></div>
+    </div>
+    <canvas id="clockCanvas"></canvas>
     <div id="solarPoints"></div>
-    <div id="solarDoW"></div>
+    <div id="solarDoW">
+      <div class="dow-header">SPRING SABBATH CHANGE</div>
+      <div class="sabbath-carousel">
+        <button class="sab-btn" id="sabbathPrev">&#8249;</button>
+        <div class="sab-rows" id="sabbathRows"></div>
+        <button class="sab-btn" id="sabbathNext">&#8250;</button>
+      </div>
+    </div>
+  </div>
+  <!-- Col 2: Sabbath info + Feasts (desktop only; on mobile this renders after clockCol) -->
+  <div id="feastCol">
     <div id="feastSidebar"></div>
   </div>
+  <!-- Col 3: Season heading + tile grid -->
   <div id="gridWrapper">
     <div id="gridHeading">
       <div class="season-name" id="headingSeason">SPRING</div>
@@ -131,6 +190,7 @@ canvas { display: block; max-width: 100%; }
       <button class="arrow-btn" id="nextQuarter">&#8250;</button>
     </div>
   </div>
+</div>
 </div>
 
 <script>
@@ -153,18 +213,22 @@ function getTzOffset(tzId, utcDate) {
 }
 
 // Build month lengths for a given Enoch year start (the March 20 equinox date)
-// Summer Month 2 (index 4) always has 31 days.
-// Winter Month 2 (index 10) has 31 days if the Gregorian year it falls in is a leap year.
+// Each season: months 1 & 2 = 30 days, month 3 = 31 days (intercalary).
+// Winter Month 3 (index 11) also receives the 365th day and leap year extra day.
 function isLeapYear(year) {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 function getMonths(equinoxYear) {
-  const winterTwoYear = equinoxYear + 1;
-  const leapWinter = isLeapYear(winterTwoYear);
-  return [30, 30, 31,  // Spring
-          30, 31, 31,  // Summer
-          30, 30, 31,  // Autumn
-          30, leapWinter ? 31 : 30, 31]; // Winter
+  // Each season's Month III has 31 days (30 base + 1 intercalary).
+  // Winter Month III also receives the 365th day every year (+1),
+  // and an additional leap day in leap years (+1).
+  // So Winter III = 31 (normal) + 1 (365th) = 32, or + 1 (leap) = 33 in a leap year.
+  const winterThreeYear = equinoxYear + 1; // the Gregorian year Winter falls in
+  const isLeap = isLeapYear(winterThreeYear);
+  return [30, 30, 31,  // Spring (Month III intercalary)
+          30, 30, 31,  // Summer (Month III intercalary)
+          30, 30, 31,  // Autumn (Month III intercalary)
+          30, 30, isLeap ? 33 : 32]; // Winter III: +365th day every year, +leap day if leap
 }
 const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
@@ -259,14 +323,12 @@ function toAngle(h) {
 function drawClock(cityDate, tzOff) {
   const canvas = document.getElementById("clockCanvas");
   const ctx    = canvas.getContext("2d");
-  // HiDPI / Retina support — scale canvas backing store by devicePixelRatio
+  // HiDPI: canvas backing store = CSS pixel size × devicePixelRatio, always square
   const dpr  = window.devicePixelRatio || 1;
-  const size = Math.min(280, window.innerWidth * 0.85);
+  const size = canvas.getBoundingClientRect().width || canvas.offsetWidth || 240;
   if (canvas.width !== Math.round(size * dpr) || canvas.height !== Math.round(size * dpr)) {
     canvas.width  = Math.round(size * dpr);
     canvas.height = Math.round(size * dpr);
-    canvas.style.width  = size + "px";
-    canvas.style.height = size + "px";
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const W = size, H = size;
@@ -353,7 +415,7 @@ function drawClock(cityDate, tzOff) {
   ctx.beginPath();
   ctx.moveTo(cx, cy);
   ctx.lineTo(cx + R * 0.70 * Math.cos(mAngle), cy + R * 0.70 * Math.sin(mAngle));
-  ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 2; ctx.lineCap = "round";
+  ctx.strokeStyle = "#ff44cc"; ctx.lineWidth = 2; ctx.lineCap = "round";
   ctx.stroke();
 
   // 8. Seconds hand (full rotation every 60 seconds)
@@ -585,17 +647,22 @@ const FEASTS = [
   { name: "Last Day of Unleavened Bread",      monthIdx: 0,  day: 21, dur: 1, types: ["holy","sabbath"] },
   { name: "First Fruits",                      monthIdx: 0,  day: 22, dur: 1, types: ["holy"] },
   { name: "Shavuot (Pentecost)",               monthIdx: 2,  day: 11, dur: 1, types: ["holy","sabbath"] },
+  { name: "Feast of Weeks (Bikkurim)",         monthIdx: 2,  day: 15, dur: 1, types: ["holy","sabbath"], desc: "Tithe your barley to God. Then eat new bread, ears of grain, soft grain." },
+  // ── SUMMER (months 3-5) ──
+  { name: "Feast of New Wine (Chag Tirosh)",   monthIdx: 4,  day: 3,  dur: 1, types: ["holy"], desc: "Pour out about 1/3 of your made wine onto the altar for God. The festival food is wine, grapes, and unripe fruit from vines. The oldest drink first." },
+  { name: "Feast of New Oil (Chag Yitzhar)",   monthIdx: 5,  day: 22, dur: 1, types: ["holy"] },
   // ── AUTUMN (months 6-8) ──
   { name: "Yom Teru'ah (Feast of Trumpets)",   monthIdx: 6,  day: 1,  dur: 1, types: ["holy","sabbath"] },
-  { name: "Yom Kippur Eve",                    monthIdx: 6,  day: 9,  dur: 1, types: ["fast"] },
-  { name: "Yom Kippur (Day of Atonement)",     monthIdx: 6,  day: 10, dur: 1, types: ["holy","sabbath","fast"] },
+  { name: "Yom Kippur Eve",                    monthIdx: 6,  day: 9,  dur: 1, types: ["fast"], desc: "A day to prepare for fasting from evening to next evening." },
+  { name: "Yom Kippur (Day of Atonement)",     monthIdx: 6,  day: 10, dur: 1, types: ["holy","sabbath","fast"], desc: 'A solemn day of fasting, reading and prayer until evening. You may celebrate after evening. Reading: <a href="http://qbible.com/brenton-septuagint/deuteronomy/32.html" target="_blank" style="color:#4da6ff">Deuteronomy 32</a>' },
   { name: "First Day of Sukkot",               monthIdx: 6,  day: 15, dur: 1, types: ["holy","sabbath"] },
   { name: "Sukkot (Feast of Tabernacles)",     monthIdx: 6,  day: 16, dur: 5, types: ["holy"] },
   { name: "Last Day of Sukkot",                monthIdx: 6,  day: 21, dur: 1, types: ["holy","sabbath"] },
   { name: "Shemini Atzeret",                   monthIdx: 6,  day: 22, dur: 1, types: ["holy","sabbath"] },
   // ── WINTER (months 9-11) ──
   { name: "Hannukah (Festival of Lights)",     monthIdx: 8,  day: 25, dur: 8, types: ["holiday"] },
-  { name: "Purim",                             monthIdx: 11, day: 13, dur: 1, types: ["holiday"], desc: "Celebrated by reading or listening to the Book of Esther, sending two different edible items to at least one person, giving money to two needy people, and a large, joyous feast." },
+  { name: "Purim",                             monthIdx: 11, day: 14, dur: 1, types: ["holiday"], desc: "Celebrated by reading or listening to the Book of Esther, sending two different edible items to at least one person, giving money to two needy people, and a large, joyous feast." },
+  { name: "Purim (Israel)",                    monthIdx: 11, day: 15, dur: 1, types: ["holiday"] },
 ];
 
 // Build a lookup: key = "monthIdx:day" -> array of feast objects active on that day
@@ -808,19 +875,10 @@ function update() {
     `<span style="color:rgb(110,50,30)">🍂 Autumn Eq:</span> ${fmtWithComma(solarEventUTC(solarYr, 2), solarTzOff2)}<br>` +
     `<span style="color:rgb(75,75,85)">❄️ Winter Sol:</span> ${fmtWithComma(solarEventUTC(solarYr, 3), solarTzOff2)}`;
 
-  // Sabbath DoW: Enoch day 7 = spring equinox + 6 days, show G-DoW for prev/curr/next year
+  // Spring Sabbath Change carousel — rendered by renderSabbathCarousel()
   const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  function sabbathGDoW(year) {
-    const eq = solarEventUTC(year, 0);
-    const sabbath = new Date(eq.getTime() + 6 * 86400000);
-    return G_WD[sabbath.getUTCDay()];
-  }
-  const prevYr = yr - 1, nextYr = yr + 1;
-  document.getElementById("solarDoW").innerHTML =
-    `<div class="dow-header">SABBATH (Gregorian DoW)</div>` +
-    `<span class="yr-prev">AD ${prevYr}: ${sabbathGDoW(prevYr)}</span> · ` +
-    `<span class="yr-curr">AD ${yr}: ${sabbathGDoW(yr)}</span> · ` +
-    `<span class="yr-next">AD ${nextYr}: ${sabbathGDoW(nextYr)}</span>`;
+  window._sabbathBaseYear = yr; // current Gregorian year
+  renderSabbathCarousel();
 
   drawClock(cityDate, tzOff);
   // Pass today's correct Gregorian DoW so drawGrid can anchor column headers from known-good value
@@ -961,14 +1019,14 @@ document.getElementById("nextQuarter").addEventListener("click", () => {
 setInterval(update, 1000);
 
 // Feast description tooltip — fixed position, never affects layout
-// Use document.addEventListener to ensure DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   const feastTooltip = document.getElementById("feast-tooltip");
   const sidebar = document.getElementById("feastSidebar");
   if (!feastTooltip || !sidebar) return;
-  function showTooltip(el, clientX, clientY) {
-    feastTooltip.textContent = el.dataset.desc;
-    feastTooltip.style.display = "block";
+
+  let locked = false; // true when tooltip is click-locked open
+
+  function positionTooltip(clientX, clientY) {
     const tw = Math.min(220, window.innerWidth - 16);
     feastTooltip.style.width = tw + "px";
     const th = feastTooltip.offsetHeight;
@@ -982,31 +1040,69 @@ document.addEventListener("DOMContentLoaded", () => {
     feastTooltip.style.top  = y + "px";
   }
 
-  // Mouse events
+  function showTooltip(el, clientX, clientY) {
+    feastTooltip.innerHTML = el.dataset.desc;
+    feastTooltip.style.display = "block";
+    positionTooltip(clientX, clientY);
+  }
+
+  // Hover: only show/hide if not locked
   sidebar.addEventListener("mouseover", e => {
+    if (locked) return;
     const el = e.target.closest("[data-desc]");
     if (!el) { feastTooltip.style.display = "none"; return; }
     showTooltip(el, e.clientX, e.clientY);
   });
   sidebar.addEventListener("mousemove", e => {
+    if (locked) return;
     const el = e.target.closest("[data-desc]");
     if (!el) { feastTooltip.style.display = "none"; return; }
     showTooltip(el, e.clientX, e.clientY);
   });
   sidebar.addEventListener("mouseout", e => {
-    if (!e.target.closest("[data-desc]")) feastTooltip.style.display = "none";
+    if (locked) return;
+    if (!e.relatedTarget || !e.relatedTarget.closest("[data-desc]")) {
+      feastTooltip.style.display = "none";
+    }
   });
 
-  // Touch events — tap to show, tap elsewhere to hide
+  // Click on feast name: lock tooltip open
+  sidebar.addEventListener("click", e => {
+    const el = e.target.closest("[data-desc]");
+    if (el) {
+      e.stopPropagation();
+      if (locked && feastTooltip.innerHTML === el.dataset.desc.replace(/&quot;/g, '"')) {
+        // Clicking same item unlocks
+        locked = false;
+        feastTooltip.style.display = "none";
+      } else {
+        locked = true;
+        showTooltip(el, e.clientX, e.clientY);
+      }
+      return;
+    }
+  });
+
+  // Click anywhere outside tooltip or feast name: unlock and hide
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#feast-tooltip") && !e.target.closest("[data-desc]")) {
+      locked = false;
+      feastTooltip.style.display = "none";
+    }
+  });
+
+  // Touch: tap to toggle lock
   sidebar.addEventListener("touchstart", e => {
     const el = e.target.closest("[data-desc]");
-    if (!el) { feastTooltip.style.display = "none"; return; }
+    if (!el) { locked = false; feastTooltip.style.display = "none"; return; }
     e.preventDefault();
     const t = e.touches[0];
+    locked = true;
     showTooltip(el, t.clientX, t.clientY);
   }, { passive: false });
   document.addEventListener("touchstart", e => {
     if (!e.target.closest("[data-desc]") && !e.target.closest("#feast-tooltip")) {
+      locked = false;
       feastTooltip.style.display = "none";
     }
   });
@@ -1063,6 +1159,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// ── Spring Sabbath Change Carousel ──
+(function() {
+  let sabbathOffset = 0;
+
+  function springDay1GDoWForYear(year) {
+    const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+    const eqUTC = solarEventUTC(year, 0);
+    const eqParts = getLocalDateParts(eqUTC, city.tzId);
+    return G_WD[new Date(Date.UTC(eqParts.year, eqParts.month, eqParts.day)).getUTCDay()];
+  }
+
+  window.renderSabbathCarousel = function() {
+    const rows = document.getElementById("sabbathRows");
+    if (!rows) return;
+    const baseYear = window._sabbathBaseYear || new Date().getUTCFullYear();
+    let html = "";
+    for (let i = -1; i <= 1; i++) {
+      const y = baseYear + sabbathOffset + i;
+      const dow = springDay1GDoWForYear(y);
+      const cls = i === 0 ? "yr-item is-current" : "yr-item is-adjacent";
+      html += `<span class="${cls}">AD ${y}: ${dow}</span>`;
+    }
+    rows.innerHTML = html;
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const prev = document.getElementById("sabbathPrev");
+    const next = document.getElementById("sabbathNext");
+    if (prev) prev.addEventListener("click", () => { sabbathOffset--; renderSabbathCarousel(); });
+    if (next) next.addEventListener("click", () => { sabbathOffset++; renderSabbathCarousel(); });
+  });
+})();
 update();
 </script>
 <div id="feast-tooltip"></div>
