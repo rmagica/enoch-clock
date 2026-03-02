@@ -35,9 +35,7 @@ h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 
   }
   #clockCol  { width: 260px; flex-shrink: 0; }
   #feastCol  { width: 240px; flex-shrink: 0; }
-  #gridWrapper { flex: 1; min-width: 0; }
-  #gridContainer { max-width: 100% !important; }
-  #gridCarousel { width: 100%; }
+  #gridWrapper { flex-shrink: 0; }
 }
 /* Clock column */
 #clockCol { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 100%; max-width: 320px; }
@@ -91,6 +89,11 @@ button {
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px; width: 100%;
   max-width: 350px;
+}
+@media (min-width: 900px) {
+  #gridContainer { gap: 3px; max-width: 420px; }
+  .dayBox { font-size: 9px; }
+  .dayNum { font-size: 11px; }
 }
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
@@ -881,7 +884,6 @@ function update() {
   // Pass today's correct Gregorian DoW so drawGrid can anchor column headers from known-good value
   const springEqForGrid = solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0);
   drawGrid(enoch, springEqForGrid, quarterOffset, cityDate.getUTCDay());
-  if (window.innerWidth >= 900) setTimeout(fitGridToViewport, 0);
 }
 
 // Built-in city fallback — used when network is unavailable (e.g. sandboxed preview)
@@ -1006,14 +1008,12 @@ document.getElementById("prevQuarter").addEventListener("click", () => {
   const utcNow = new Date();
   const enoch = getEnoch(utcNow, city);
   drawGrid(enoch, solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0), quarterOffset);
-  if (window.innerWidth >= 900) setTimeout(fitGridToViewport, 0);
 });
 document.getElementById("nextQuarter").addEventListener("click", () => {
   quarterOffset++;
   const utcNow = new Date();
   const enoch = getEnoch(utcNow, city);
   drawGrid(enoch, solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0), quarterOffset);
-  if (window.innerWidth >= 900) setTimeout(fitGridToViewport, 0);
 });
 
 setInterval(update, 1000);
@@ -1160,64 +1160,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ── Desktop grid sizing: fit all tiles within viewport height ──
-function fitGridToViewport() {
-  if (window.innerWidth < 900) {
-    // Mobile: reset everything
-    document.getElementById('gridContainer').style.gridTemplateRows = '';
-    document.getElementById('gridContainer').style.gap = '4px';
-    const boxes = document.querySelectorAll('.dayBox');
-    boxes.forEach(b => { b.style.width = ''; b.style.height = ''; b.style.fontSize = ''; });
-    document.querySelectorAll('.dayNum').forEach(e => e.style.fontSize = '');
-    document.querySelectorAll('.angelLabel').forEach(e => e.style.fontSize = '');
-    document.querySelectorAll('.dayHeader').forEach(e => e.style.fontSize = '');
-    return;
-  }
-
-  const fixedH = document.getElementById('fixedHeader').offsetHeight;
-  const heading = document.getElementById('gridHeading');
-  const carousel = document.getElementById('gridCarousel');
-  const grid = document.getElementById('gridContainer');
-
-  // Available height = viewport - fixed header - pageContent padding - gridWrapper gap - heading
-  const available = window.innerHeight - fixedH - 16 - 10 - heading.offsetHeight;
-
-  // 14 rows: 1 header row + 13 day rows. Gap between them.
-  const gap = 3;
-  const rows = 14;
-  const tileSize = Math.floor((available - gap * (rows - 1)) / rows);
-
-  if (tileSize < 10) return; // too small, bail
-
-  grid.style.gap = gap + 'px';
-  grid.style.gridTemplateRows = `${tileSize * 0.7}px ` + `${tileSize}px `.repeat(13).trim();
-
-  // Scale text proportionally
-  const scale = tileSize / 32; // 32px is the "natural" tile size
-  document.querySelectorAll('.dayHeader').forEach(e => {
-    e.style.fontSize = Math.max(6, Math.round(10 * scale)) + 'px';
-    e.style.padding = Math.max(1, Math.round(3 * scale)) + 'px 0';
-  });
-  document.querySelectorAll('.dayNum').forEach(e => {
-    e.style.fontSize = Math.max(6, Math.round(13 * scale)) + 'px';
-  });
-  document.querySelectorAll('.angelLabel').forEach(e => {
-    e.style.fontSize = Math.max(4, Math.round(7 * scale)) + 'px';
-  });
-  document.querySelectorAll('.dayBox').forEach(e => {
-    e.style.fontSize = Math.max(6, Math.round(10 * scale)) + 'px';
-  });
-
-  // Scale heading text
-  heading.querySelector('.season-name').style.fontSize  = Math.max(10, Math.round(16 * scale)) + 'px';
-  heading.querySelector('.enoch-year').style.fontSize   = Math.max(8,  Math.round(12 * scale)) + 'px';
-  heading.querySelector('.greg-year').style.fontSize    = Math.max(8,  Math.round(12 * scale)) + 'px';
-  heading.querySelector('.season-angel').style.fontSize = Math.max(7,  Math.round(11 * scale)) + 'px';
-  heading.querySelector('.season-start').style.fontSize = Math.max(7,  Math.round(11 * scale)) + 'px';
-}
-
-window.addEventListener('resize', fitGridToViewport);
-
 // ── Spring Sabbath Change Carousel ──
 (function() {
   let sabbathOffset = 0;
@@ -1251,8 +1193,6 @@ window.addEventListener('resize', fitGridToViewport);
   });
 })();
 update();
-// Run after DOM has rendered so offsetHeight values are accurate
-setTimeout(fitGridToViewport, 50);
 </script>
 <div id="feast-tooltip"></div>
 <div id="day-tooltip"></div>
