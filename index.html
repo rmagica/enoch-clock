@@ -12,7 +12,7 @@ body {
   padding: 20px 12px; min-height: 100vh; width: 100%;
 }
 h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: clamp(14px,4vw,18px); margin-bottom: 8px; text-align: center; }
-#subtitle { opacity: 0.85; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; }
+#subtitle { opacity: 0.85; font-size: clamp(10px,2.5vw,12px); margin-bottom: 8px; letter-spacing: 1px; text-align: center; word-break: break-word; padding: 0 8px; white-space: pre-line; }
 #gregorian { color: #4da6ff; font-size: clamp(10px,2.5vw,12px); margin-bottom: 16px; letter-spacing: 1px; text-align: center; }
 #controls { display: flex; gap: 8px; margin-bottom: 6px; width: 100%; max-width: 340px; }
 input {
@@ -29,10 +29,10 @@ button {
 #error { color: #ff6666; font-size: 12px; min-height: 18px; margin-bottom: 4px; text-align: center; }
 #cityLabel { opacity: 0.85; font-size: 12px; margin-bottom: 12px; text-align: center; }
 #cityLabel strong { color: #f5c842; }
-#debug { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 16px; font-family: monospace; text-align: center; word-break: break-all; padding: 0 8px; }
+#debug { font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 16px; font-family: monospace; text-align: center; word-break: normal; overflow-wrap: normal; white-space: pre-wrap; padding: 0 8px; }
 #mainContainer { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; justify-content: center; width: 100%; }
 #clockCol { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-canvas { display: block; border-radius: 50%; max-width: 100%; }
+canvas { display: block; max-width: 100%; }
 #solarPoints { font-size: clamp(10px,2.5vw,12px); opacity: 0.85; text-align: center; line-height: 1.9; }
 #solarDoW { font-size: clamp(10px,2.5vw,11px); opacity: 0.85; text-align: center; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 #solarDoW .dow-header { color: #4da6ff; font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
@@ -61,28 +61,22 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
   background: rgba(255,255,255,0.04); color: white; font-size: clamp(8px,2vw,10px);
   position: relative; cursor: default;
 }
-.dayBox .tooltip {
-  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-  background: #222; color: #f5c842; font-size: 10px; white-space: nowrap;
-  padding: 3px 7px; border-radius: 4px; border: 1px solid #f5c842;
-  pointer-events: none; z-index: 10;
-}
-.dayBox:hover .tooltip { display: block; }
-.dayBox.current { border: 2px solid #f5c842; background: #f5c842; color: #000; font-weight: bold; }
+.dayBox .tooltip { display: none; }
+.dayBox.current { border: 2px solid #c8a0d8; background: #c8a0d8; color: #000; font-weight: bold; }
 .dayBox.saturday { background: #add8e6; color: #000; border-color: #add8e6; }
-.dayBox { position: relative; cursor: default; }
-.dayBox .tooltip {
-  display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-  background: #222; color: #f5c842; font-size: 10px; white-space: nowrap;
-  padding: 3px 7px; border-radius: 4px; border: 1px solid #f5c842;
-  pointer-events: none; z-index: 10;
+.dayBox { position: relative; cursor: pointer; }
+#day-tooltip {
+  display: none; position: fixed; z-index: 100;
+  background: #222; color: #f5c842; font-size: 11px; white-space: nowrap;
+  padding: 4px 9px; border-radius: 4px; border: 1px solid #f5c842;
+  pointer-events: none;
 }
-.dayBox:hover .tooltip { display: block; }
 .dayNum { font-size: 13px; }
 .angelLabel { font-size: 7px; opacity: 0.6; }
 /* Feast outlines use box-shadow so they layer without overlapping borders */
 .dayBox.feast-holy    { box-shadow: 0 0 0 2px #ffe600; }
 .dayBox.feast-sabbath { box-shadow: 0 0 0 2px #add8e6; }
+.dayBox.feast-holiday { box-shadow: 0 0 0 2px #9b59b6; }
 .dayBox.feast-fast    { box-shadow: 0 0 0 2px #ff3333; }
 .dayBox.feast-holy.feast-sabbath    { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #add8e6; }
 .dayBox.feast-holy.feast-fast       { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #ff3333; }
@@ -90,9 +84,10 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
 .dayBox.feast-holy.feast-sabbath.feast-fast { box-shadow: 0 0 0 2px #ffe600, 0 0 0 4px #add8e6, 0 0 0 6px #ff3333; }
 #feastSidebar { font-size: 11px; line-height: 1.8; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; min-width: 200px; max-width: 280px; }
 #feastSidebar .feast-section-header { font-size: 11px; letter-spacing: 1px; font-weight: bold; margin-top: 8px; margin-bottom: 2px; }
-#feastSidebar .feast-entry { display: flex; gap: 6px; align-items: baseline; }
-#feastSidebar .feast-date { color: rgba(255,255,255,0.5); min-width: 28px; font-size: 10px; }
-#feastSidebar .feast-name { color: white; }
+#feastSidebar .feast-entry { display: block; margin-bottom: 8px; }
+#feastSidebar .feast-date { display: block; color: rgba(255,255,255,0.5); font-size: 10px; }
+#feastSidebar .feast-name { display: block; color: white; }
+#feastSidebar .feast-tag { display: block; color: rgba(255,255,255,0.45); font-size: 9px; }
 #feastSidebar .feast-tag  { font-size: 9px; opacity: 0.6; font-style: italic; }
 #feastSidebar .feast-name-wrap { display: inline; }
 #feast-tooltip {
@@ -109,15 +104,15 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
 <div id="subtitle">...</div>
 <div id="gregorian"></div>
 <div id="controls">
-  <input id="cityInput" placeholder="Enter city (e.g. Vancouver)">
+  <input id="cityInput" placeholder="Any city worldwide…">
   <button id="setCity">Set</button>
 </div>
 <div id="error"></div>
-<div id="cityLabel">City: <strong id="cityName">vancouver</strong> &nbsp;|&nbsp; <span id="timeDisplay"></span></div>
+<div id="cityLabel">City: <strong id="cityName">Vancouver</strong> &nbsp;|&nbsp; <span id="timeDisplay"></span></div>
 <div id="debug"></div>
 <div id="mainContainer">
   <div id="clockCol">
-    <canvas id="clockCanvas" width="280" height="280" style="width:min(280px,85vw);height:min(280px,85vw)"></canvas>
+    <canvas id="clockCanvas" style="width:min(280px,85vw);height:min(280px,85vw);border-radius:50%"></canvas>
     <div id="solarPoints"></div>
     <div id="solarDoW"></div>
     <div id="feastSidebar"></div>
@@ -126,8 +121,8 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
     <div id="gridHeading">
       <div class="season-name" id="headingSeason">SPRING</div>
       <div class="season-angel" id="headingSeasonAngel">Season Angel: Melkeyal</div>
-      <div class="enoch-year" id="headingEnochYear">YEAR 7569</div>
-      <div class="greg-year"  id="headingGregYear">2026 AD</div>
+      <div class="enoch-year" id="headingEnochYear">AA 7569</div>
+      <div class="greg-year"  id="headingGregYear">AD 2026</div>
       <div class="season-start" id="headingSeasonStart">Season Start: 21 December</div>
     </div>
     <div id="gridCarousel">
@@ -143,59 +138,56 @@ canvas { display: block; border-radius: 50%; max-width: 100%; }
 
 let quarterOffset = 0; // 0=current quarter, negative=past, positive=future
 
-// US/Canada DST: starts 2nd Sunday of March, ends 1st Sunday of November
-function isDST(utcDate, observesDST) {
-  if (!observesDST) return false;
-  const yr = utcDate.getUTCFullYear();
-  // 2nd Sunday of March
-  const mar1  = new Date(Date.UTC(yr, 2, 1));
-  const dstStart = new Date(Date.UTC(yr, 2, 1 + (7 - mar1.getUTCDay()) % 7 + 7, 2));
-  // 1st Sunday of November
-  const nov1  = new Date(Date.UTC(yr, 10, 1));
-  const dstEnd = new Date(Date.UTC(yr, 10, 1 + (7 - nov1.getUTCDay()) % 7, 2));
-  return utcDate >= dstStart && utcDate < dstEnd;
+// Dynamic timezone support using Intl API — works for any IANA timezone
+function getTzOffset(tzId, utcDate) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tzId, year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+  });
+  const parts = fmt.formatToParts(utcDate);
+  const get = type => parseInt(parts.find(p => p.type === type).value);
+  const h = get("hour") % 24;
+  const localDate = new Date(Date.UTC(get("year"), get("month")-1, get("day"), h, get("minute"), get("second")));
+  // Round to nearest minute to avoid floating-point drift causing date boundary errors
+  return Math.round((localDate - utcDate) / 60000) / 60;
 }
-
-// City DB: stdOffset = UTC offset in standard time, dst = observes DST
-const CITY_DB = {
-  vancouver:   { lat: 49.2827,  lon: -123.1207, stdOffset: -8,  dst: true  },
-  hawaii:      { lat: 21.3069,  lon: -157.8583,  stdOffset: -10, dst: false },
-  guadalajara: { lat: 20.6597,  lon: -103.3496,  stdOffset: -6,  dst: false },
-};
 
 // Build month lengths for a given Enoch year start (the March 20 equinox date)
 // Summer Month 2 (index 4) always has 31 days.
 // Winter Month 2 (index 10) has 31 days if the Gregorian year it falls in is a leap year.
-// Winter II starts after 9 months (274 days) + 30 days = day 305 of the Enoch year,
-// which falls in January/February of the year AFTER the equinox year.
 function isLeapYear(year) {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 function getMonths(equinoxYear) {
-  // Winter II starts ~305 days after the spring equinox — work out which Gregorian year that lands in
-  // Spring equinox is ~Mar 20, +305 days = ~Jan 19 of the following year
-  // So Winter II always falls in equinoxYear + 1
   const winterTwoYear = equinoxYear + 1;
   const leapWinter = isLeapYear(winterTwoYear);
   return [30, 30, 31,  // Spring
-          30, 31, 31,  // Summer (month 2 = 31)
+          30, 31, 31,  // Summer
           30, 30, 31,  // Autumn
-          30, leapWinter ? 31 : 30, 31]; // Winter (month 2 = 31 if next year is leap)
+          30, leapWinter ? 31 : 30, 31]; // Winter
 }
 const ANGELS = ["Adnarel","Iyasusael","Ijelumiel"];
 
-let city = CITY_DB.vancouver;
+// City object: lat, lon, tzId (IANA), name
+let city = { lat: 49.2827, lon: -123.1207, tzId: "America/Vancouver", name: "Vancouver" };
 
 function getCityTime(c) {
   const utcNow = new Date();
-  const offset = c.stdOffset + (isDST(utcNow, c.dst) ? 1 : 0);
-  // Create a date whose getHours()/getMinutes() reflect city local time
+  const offset = getTzOffset(c.tzId, utcNow);
   return new Date(utcNow.getTime() + offset * 3600000);
 }
 
 function getCityOffset(c) {
-  const utcNow = new Date();
-  return c.stdOffset + (isDST(utcNow, c.dst) ? 1 : 0);
+  // Round to nearest 15 minutes (smallest real-world tz offset) to prevent floating point drift
+  return Math.round(getTzOffset(c.tzId, new Date()) * 4) / 4;
+}
+
+// isDST: compare summer vs winter offset to detect DST
+function isDST(utcDate, tzId) {
+  if (!tzId) return false;
+  const janOff = getTzOffset(tzId, new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 15)));
+  const curOff = getTzOffset(tzId, utcDate);
+  return curOff > janOff;
 }
 
 function sunTimes(date, lat, lon, tzOff) {
@@ -215,50 +207,44 @@ function sunTimes(date, lat, lon, tzOff) {
   return { sunrise: 12 - ha / 15 - TC, sunset: 12 + ha / 15 - TC };
 }
 
+// Get local calendar date {year, month(0-based), day} for a UTC moment using Intl — no offset math
+function getLocalDateParts(utcDate, tzId) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tzId || "UTC", year: "numeric", month: "2-digit", day: "2-digit"
+  });
+  const parts = fmt.formatToParts(utcDate);
+  return {
+    year:  parseInt(parts.find(p => p.type === "year").value),
+    month: parseInt(parts.find(p => p.type === "month").value) - 1,
+    day:   parseInt(parts.find(p => p.type === "day").value)
+  };
+}
+
 function getEnoch(utcDate, cityObj) {
-  // Enoch day boundary = local sunrise at the spring equinox, not midnight
-  // cityObj is optional — if omitted, falls back to midnight UTC boundary
-  const c = cityObj || null;
+  const tzId = cityObj ? cityObj.tzId : "UTC";
 
-  // Find the spring equinox UTC date for this cycle
-  let eqYear = utcDate.getUTCFullYear();
-  // Approximate equinox as Mar 20 to find the right year first
-  let eqApprox = new Date(Date.UTC(eqYear, 2, 20));
-  if (utcDate < eqApprox) eqApprox = new Date(Date.UTC(eqYear - 1, 2, 20));
-  const eqYearFinal = eqApprox.getUTCFullYear();
+  // Get today's local calendar date — pure Intl, no floating point offset math
+  const todayParts = getLocalDateParts(utcDate, tzId);
+  const todayUTC = new Date(Date.UTC(todayParts.year, todayParts.month, todayParts.day));
 
-  // Get precise equinox UTC time from Meeus
-  const preciseEqUTC = solarEventUTC(eqYearFinal, 0);
-
-  // Calculate sunrise time on the spring equinox day in city local time
-  // Sunrise time is the Enoch "day 1 start" — every subsequent day starts at the same clock time
-  let dayBoundaryUTC; // UTC time of the start of Enoch day 1
-  if (c) {
-    // DST offset on the day of the equinox (not today — use the equinox date for DST check)
-    const eqDSTOffset = c.stdOffset + (isDST(preciseEqUTC, c.dst) ? 1 : 0);
-    // Sunrise on equinox day
-    const sr = sunTimes(preciseEqUTC, c.lat, c.lon, eqDSTOffset);
-    // sr.sunrise is in local decimal hours — convert to UTC ms
-    // The equinox local date
-    const eqLocalMidnightUTC = new Date(preciseEqUTC.getTime() + eqDSTOffset * 3600000);
-    const eqLocalDate = new Date(Date.UTC(
-      eqLocalMidnightUTC.getUTCFullYear(),
-      eqLocalMidnightUTC.getUTCMonth(),
-      eqLocalMidnightUTC.getUTCDate()
-    ));
-    // Sunrise UTC = local equinox midnight UTC + sunrise hours - DST offset
-    dayBoundaryUTC = new Date(eqLocalDate.getTime() + (sr.sunrise - eqDSTOffset) * 3600000);
-  } else {
-    // Fallback: use midnight UTC of the equinox date
-    dayBoundaryUTC = new Date(Date.UTC(eqYearFinal, 2, 20));
+  // Find the equinox year: get the local date of this year's equinox, compare to today
+  let eqYearFinal = todayParts.year;
+  let eqUTC = solarEventUTC(eqYearFinal, 0);
+  let eqParts = getLocalDateParts(eqUTC, tzId);
+  let dayBoundaryUTC = new Date(Date.UTC(eqParts.year, eqParts.month, eqParts.day));
+  // If today is before this year's equinox, use last year's
+  if (todayUTC < dayBoundaryUTC) {
+    eqYearFinal--;
+    eqUTC = solarEventUTC(eqYearFinal, 0);
+    eqParts = getLocalDateParts(eqUTC, tzId);
+    dayBoundaryUTC = new Date(Date.UTC(eqParts.year, eqParts.month, eqParts.day));
   }
 
   const MONTHS = getMonths(eqYearFinal);
   const yearLen = MONTHS.reduce((a, b) => a + b, 0);
 
-  // Each Enoch day is exactly 86400000ms starting from dayBoundaryUTC
-  const msElapsed = utcDate - dayBoundaryUTC;
-  const diff = Math.floor(msElapsed / 86400000) + 1;
+  // Pure integer day count — both dates are UTC midnight, so no fractional days possible
+  const diff = Math.round((todayUTC - dayBoundaryUTC) / 86400000) + 1;
   const doy  = ((diff - 1) % yearLen) + 1;
   let idx = 0, dc = doy;
   for (const m of MONTHS) { if (dc <= m) break; dc -= m; idx++; }
@@ -273,7 +259,17 @@ function toAngle(h) {
 function drawClock(cityDate, tzOff) {
   const canvas = document.getElementById("clockCanvas");
   const ctx    = canvas.getContext("2d");
-  const W = canvas.width, H = canvas.height;
+  // HiDPI / Retina support — scale canvas backing store by devicePixelRatio
+  const dpr  = window.devicePixelRatio || 1;
+  const size = Math.min(280, window.innerWidth * 0.85);
+  if (canvas.width !== Math.round(size * dpr) || canvas.height !== Math.round(size * dpr)) {
+    canvas.width  = Math.round(size * dpr);
+    canvas.height = Math.round(size * dpr);
+    canvas.style.width  = size + "px";
+    canvas.style.height = size + "px";
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const W = size, H = size;
   const cx = W / 2, cy = H / 2, R = cx - 18;
 
   ctx.clearRect(0, 0, W, H);
@@ -285,9 +281,16 @@ function drawClock(cityDate, tzOff) {
 
   const { sunrise: SR, sunset: SS } = sunTimes(new Date(), city.lat, city.lon, tzOff);
 
+  const dbgParts = getLocalDateParts(new Date(), city.tzId);
+  function decHrToHHMM(h) {
+    const hh = Math.floor(h) % 24;
+    const mm = Math.round((h - Math.floor(h)) * 60);
+    return String(hh).padStart(2,"0") + ":" + String(mm).padStart(2,"0");
+  }
   document.getElementById("debug").textContent =
-    `sunrise=${SR.toFixed(2)}h  sunset=${SS.toFixed(2)}h  tzOff=${tzOff}  ` +
-    `localTime=${localH}:${String(localM).padStart(2,"0")}`;
+    `localDate=${dbgParts.year}-${String(dbgParts.month+1).padStart(2,"0")}-${String(dbgParts.day).padStart(2,"0")}\n` +
+    `localTime=${localH}:${String(localM).padStart(2,"0")}  tzOff=${tzOff}\n` +
+    `sunrise=${decHrToHHMM(SR)}  sunset=${decHrToHHMM(SS)}`;
 
   // 1. Full circle = NIGHT (dark blue)
   ctx.beginPath();
@@ -328,7 +331,7 @@ function drawClock(cityDate, tzOff) {
 
   // 5. Hour numbers (0–23, 24h face)
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = "bold 10px Georgia";
+  ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, sans-serif";
   for (let i = 0; i < 24; i++) {
     const a = toAngle(i);
     const x = cx + (R - 22) * Math.cos(a);
@@ -358,7 +361,7 @@ function drawClock(cityDate, tzOff) {
   ctx.beginPath();
   ctx.moveTo(cx, cy);
   ctx.lineTo(cx + R * 0.80 * Math.cos(sAngle), cy + R * 0.80 * Math.sin(sAngle));
-  ctx.strokeStyle = "rgba(255,180,0,0.9)"; ctx.lineWidth = 1; ctx.lineCap = "round";
+  ctx.strokeStyle = "#add8e6"; ctx.lineWidth = 1.5; ctx.lineCap = "round";
   ctx.stroke();
 
   // 9. Centre dot
@@ -367,7 +370,7 @@ function drawClock(cityDate, tzOff) {
   ctx.fillStyle = "#ff3333"; ctx.fill();
 }
 
-function drawGrid(enoch, springEqDate, qOffset) {
+function drawGrid(enoch, springEqDate, qOffset, todayGDoW) {
   const g = document.getElementById("gridContainer");
   g.innerHTML = "";
 
@@ -383,34 +386,53 @@ function drawGrid(enoch, springEqDate, qOffset) {
   const targetSpringEq = solarEventUTC(targetEqYear, 0);
   const MONTHS = getMonths(targetEqYear);
 
-  // 2. Compute targetDayBoundary (sunrise on equinox day) for tooltip dates + G-DoW headers
+  // 2. targetDayBoundary = local midnight on the equinox day
   const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
-  const eqDSTOff = city.stdOffset + (isDST(targetSpringEq, city.dst) ? 1 : 0);
-  const srEq = sunTimes(targetSpringEq, city.lat, city.lon, eqDSTOff);
-  const eqLocalMidnight = new Date(targetSpringEq.getTime() + eqDSTOff * 3600000);
-  const eqMidnightUTC = new Date(Date.UTC(
-    eqLocalMidnight.getUTCFullYear(), eqLocalMidnight.getUTCMonth(), eqLocalMidnight.getUTCDate()
-  ));
-  const targetDayBoundary = new Date(eqMidnightUTC.getTime() + (srEq.sunrise - eqDSTOff) * 3600000);
-  const boundaryLocal = new Date(targetDayBoundary.getTime() + eqDSTOff * 3600000);
-  const springDay1GDoW = boundaryLocal.getUTCDay();
+  let targetDayBoundary;
+  let springDay1GDoW;
+  if (yearShift === 0) {
+    targetDayBoundary = enoch.dayBoundaryUTC;
+    // Back-calculate springDay1GDoW from today's known-correct Gregorian DoW
+    // Today is Enoch weekday enoch.weekday, so Enoch day 1 (Sunday) is
+    // (todayGDoW - (enoch.weekday - 1) + 7) % 7 days back
+    springDay1GDoW = (todayGDoW - (enoch.weekday - 1) + 7) % 7;
+  } else {
+    const eqParts3 = getLocalDateParts(targetSpringEq, city.tzId);
+    targetDayBoundary = new Date(Date.UTC(eqParts3.year, eqParts3.month, eqParts3.day));
+    springDay1GDoW = targetDayBoundary.getUTCDay();
+  }
 
   // 3. Compute quarter base + daysBeforeQuarter BEFORE rendering headers
   const base = displayQuarterIdx * 3;
   let daysBeforeQuarter = 0;
   for (let m = 0; m < base; m++) daysBeforeQuarter += MONTHS[m];
-  // G-DoW of Enoch col 0 (Sunday) for this quarter
-  const eqOffset = (springDay1GDoW + daysBeforeQuarter % 7) % 7;
 
-  // 4. Render column headers (eqOffset now defined)
-  const ENOCH_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  // eqOffset = G-DoW of Enoch col 0 (Enoch Sunday) for this quarter.
+  // Each season has 91 Enoch-week days (13 weeks). Any extra calendar days
+  // beyond 91 per season (intercalary days) shift the Gregorian anchor forward
+  // but do NOT advance the Enoch week — so eqOffset shifts by those extra days.
+  let extraDaysBeforeQuarter = 0;
+  for (let q = 0; q < displayQuarterIdx; q++) {
+    const qTotal = MONTHS[q*3] + MONTHS[q*3+1] + MONTHS[q*3+2];
+    extraDaysBeforeQuarter += qTotal - 91;
+  }
+  const eqOffset = (springDay1GDoW + extraDaysBeforeQuarter) % 7;
+
+  // Enoch week column start for this quarter
+  let intercalaryBeforeQ = 0;
+  for (let m = 0; m < base; m++) if (MONTHS[m] === 31) intercalaryBeforeQ++;
+  const enochColStart = (daysBeforeQuarter - intercalaryBeforeQ) % 7;
+
+  // Column 6 is always Enoch Saturday
+  const satHeaderCol = 6;
+  const ENOCH_WD = ["Light","Heaven","Plants","Stars","Birds","Man","Sabbath"];
   for (let i = 0; i < 7; i++) {
     const gName = G_WD[(eqOffset + i) % 7];
     const h = document.createElement("div");
     h.className = "dayHeader";
-    const isSatCol = (i === 6);
+    const isSatCol = (i === satHeaderCol);
     const headerColor = isSatCol ? "#4da6ff" : "#f5c842";
-    const subColor = isSatCol ? "#4da6ff" : "#ff8c00";
+    const subColor = isSatCol ? "#4da6ff" : "#ffffff";
     h.innerHTML = `<span style="color:${headerColor}">${ENOCH_WD[i]}</span><br><span style="font-size:9px;color:${subColor};font-weight:normal">${gName}</span>`;
     g.appendChild(h);
   }
@@ -435,8 +457,8 @@ function drawGrid(enoch, springEqDate, qOffset) {
   document.getElementById("headingSeason").textContent = SEASONS_LABEL[displayQuarterIdx];
   document.getElementById("headingSeason").style.color = seasonColor;
   document.getElementById("headingSeasonAngel").textContent = "Season Angel: " + SEASON_ANGELS[displayQuarterIdx];
-  document.getElementById("headingEnochYear").textContent = "YEAR " + displayEnoch.year;
-  document.getElementById("headingGregYear").textContent = quarterMidDate.getUTCFullYear() + " AD";
+  document.getElementById("headingEnochYear").textContent = "AA " + displayEnoch.year;
+  document.getElementById("headingGregYear").textContent = "AD " + quarterMidDate.getUTCFullYear();
   document.getElementById("headingSeasonStart").textContent = "Season Start: " + seasonStartStr;
   document.getElementById("headingSeasonStart").style.color = seasonColor;
   // Each month gets a solid colour — 3 distinct steps per season
@@ -463,10 +485,14 @@ function drawGrid(enoch, springEqDate, qOffset) {
     return MONTH_COLORS[monthIdx] || "rgba(255,255,255,0.04)";
   }
 
-  let col = 0;
+  // enochCol tracks the continuous Enoch weekday column (0=Sun...6=Sat)
+  // It must start at daysBeforeQuarter%7 so it's continuous from spring equinox
+  let col = 0; // position within quarter (for tooltip date calculation)
+
   for (let i = 0; i < 3; i++) {
     for (let d = 1; d <= MONTHS[base + i]; d++) {
       const box = document.createElement("div");
+      const isIntercalary = (d === 31 && MONTHS[base + i] === 31);
       const isCurrent = (yearShift === 0 && displayQuarterIdx === currentQuarterIdx && base + i === enoch.monthIndex && d === enoch.day);
       const isSat = (col % 7 === 6);
       // Apply season colour (skip for current day and saturday which have their own styles)
@@ -483,7 +509,8 @@ function drawGrid(enoch, springEqDate, qOffset) {
       const hasHoliday = dayFeasts.some(f => f.types.includes("holiday"));
       let feastClasses = "";
       if (hasHoly)              feastClasses += " feast-holy";
-      if (hasSabbath || hasHoliday) feastClasses += " feast-sabbath";
+      if (hasSabbath) feastClasses += " feast-sabbath";
+      if (hasHoliday) feastClasses += " feast-holiday";
       if (hasFast)              feastClasses += " feast-fast";
       box.className = "dayBox" + (isCurrent ? " current" : (isSat ? " saturday" : "")) + feastClasses;
       // Gregorian date = spring equinox + days before this quarter + position within quarter
@@ -494,9 +521,10 @@ function drawGrid(enoch, springEqDate, qOffset) {
       box.innerHTML = `<span class="dayNum">${d}</span><span class="angelLabel">${ANGELS[i].slice(0,4)}</span><span class="tooltip">${gregStr}${feastNames ? " · " + feastNames : ""}</span>`;
       g.appendChild(box);
       col++;
+
     }
   }
-  updateFeastSidebar(displayQuarterIdx, MONTHS);
+  updateFeastSidebar(displayQuarterIdx, MONTHS, targetDayBoundary);
 }
 
 function solarEventUTC(year, which) {
@@ -618,13 +646,30 @@ function getFeastsForDay(monthIdx, day, months) {
 
 const feastLookup = buildFeastLookup();
 
-function updateFeastSidebar(displayQuarterIdx, months) {
+function updateFeastSidebar(displayQuarterIdx, months, dayBoundary) {
   const base = displayQuarterIdx * 3;
   const sidebar = document.getElementById("feastSidebar");
   const MONTH_NAMES = ["Spring I","Spring II","Spring III","Summer I","Summer II","Summer III",
                        "Autumn I","Autumn II","Autumn III","Winter I","Winter II","Winter III"];
 
   // Format a feast date range as "Spring I, 14" or "Autumn III, 25 – Winter I, 6"
+  const GREG_MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function enochToGreg(monthIdx, day, endMonthIdx, endDay) {
+    if (!dayBoundary) return "";
+    let daysFromStart = 0;
+    for (let m = 0; m < monthIdx; m++) daysFromStart += months[m];
+    daysFromStart += day - 1;
+    const gStart = new Date(dayBoundary.getTime() + daysFromStart * 86400000);
+    const startStr = GREG_MONTHS_SHORT[gStart.getUTCMonth()] + " " + gStart.getUTCDate();
+    if (endMonthIdx === undefined || (endMonthIdx === monthIdx && endDay === day)) return startStr;
+    let daysFromStart2 = 0;
+    for (let m = 0; m < endMonthIdx; m++) daysFromStart2 += months[m];
+    daysFromStart2 += endDay - 1;
+    const gEnd = new Date(dayBoundary.getTime() + daysFromStart2 * 86400000);
+    const endStr = GREG_MONTHS_SHORT[gEnd.getUTCMonth()] + " " + gEnd.getUTCDate();
+    return startStr + "–" + endStr;
+  }
+
   function feastDateLabel(f, months) {
     const startLabel = MONTH_NAMES[f.monthIdx] + ", " + f.day;
     if (f.dur === 1) return startLabel;
@@ -662,29 +707,38 @@ function updateFeastSidebar(displayQuarterIdx, months) {
   if (holyFeasts.length > 0) {
     html += `<div class="feast-section-header" style="color:#ffe600">✦ HOLY FEASTS</div>`;
     for (const f of holyFeasts) {
-      const tags = f.types.filter(t => t !== "holy").map(t =>
-        t === "sabbath" ? "Sabbath" : t === "fast" ? "Fast" : ""
-      ).filter(Boolean).join(", ");
+      const tagHtml = f.types
+        .filter(t => t === "sabbath" || t === "fast")
+        .map(t => t === "sabbath"
+          ? `<span style="color:#4da6ff">(Sabbath)</span>`
+          : `<span style="color:#ff3333">(Fast)</span>`)
+        .join(" ");
       const dateLabel = feastDateLabel(f, months);
+      let _endMI = f.monthIdx, _endD = f.day + f.dur - 1;
+      while (_endMI < 11 && _endD > months[_endMI]) { _endD -= months[_endMI]; _endMI++; }
+      const gregLabel = enochToGreg(f.monthIdx, f.day, _endMI, _endD);
       const nameHtml = f.desc
         ? `<span class="feast-name-wrap"><span class="feast-name" style="cursor:help;text-decoration:underline dotted rgba(255,255,255,0.4)" data-desc="${f.desc.replace(/"/g,'&quot;')}">${f.name}</span></span>`
         : `<span class="feast-name">${f.name}</span>`;
       html += `<div class="feast-entry">` +
-        `<span class="feast-date" style="min-width:0;margin-right:4px;color:rgba(255,255,255,0.6)">${dateLabel}</span>` +
+        `<span class="feast-date">${dateLabel}${gregLabel ? ` <span style="opacity:0.5">(${gregLabel})</span>` : ""}</span>` +
         nameHtml +
-        `${tags ? `<span class="feast-tag">(${tags})</span>` : ""}` +
+        `${tagHtml ? `<span class="feast-tag">${tagHtml}</span>` : ""}` +
         `</div>`;
     }
   }
   if (holidays.length > 0) {
-    html += `<div class="feast-section-header" style="color:#aaffaa;margin-top:8px">✦ SPECIAL DAYS</div>`;
+    html += `<div class="feast-section-header" style="color:#9b59b6;margin-top:8px">✦ SPECIAL DAYS</div>`;
     for (const f of holidays) {
       const dateLabel = feastDateLabel(f, months);
+      let _endMI2 = f.monthIdx, _endD2 = f.day + f.dur - 1;
+      while (_endMI2 < 11 && _endD2 > months[_endMI2]) { _endD2 -= months[_endMI2]; _endMI2++; }
+      const gregLabel2 = enochToGreg(f.monthIdx, f.day, _endMI2, _endD2);
       const nameHtml2 = f.desc
         ? `<span class="feast-name-wrap"><span class="feast-name" style="cursor:help;text-decoration:underline dotted rgba(255,255,255,0.4)" data-desc="${f.desc.replace(/"/g,'&quot;')}">${f.name}</span></span>`
         : `<span class="feast-name">${f.name}</span>`;
       html += `<div class="feast-entry">` +
-        `<span class="feast-date" style="min-width:0;margin-right:4px;color:rgba(255,255,255,0.6)">${dateLabel}</span>` +
+        `<span class="feast-date">${dateLabel}${gregLabel2 ? ` <span style="opacity:0.5">(${gregLabel2})</span>` : ""}</span>` +
         nameHtml2 +
         `</div>`;
     }
@@ -715,23 +769,44 @@ function update() {
   const monthInSeason = enoch.monthIndex % 3;               // 0-2
   const seasonLabel = SEASONS[seasonIdx] + " " + SEASON_ROMAN[monthInSeason];
 
-  document.getElementById("subtitle").textContent =
-    `YEAR ${enoch.year} · ${seasonLabel} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday} (${WD_NAMES[enoch.weekday-1]})`;
-
   // Gregorian line — use cityDate for local date
   const gregWD = WD_NAMES[cityDate.getUTCDay()];
   const gregMon = GREG_MONTHS[cityDate.getUTCMonth()];
-  document.getElementById("gregorian").textContent =
-    `G-YEAR ${cityDate.getUTCFullYear()} · ${gregMon} · ${cityDate.getUTCDate()} · ${gregWD}`;
+  document.getElementById("subtitle").textContent =
+    `AA ${enoch.year} · ${seasonLabel} · DAY ${enoch.day} · WEEKDAY ${enoch.weekday} (${WD_NAMES[enoch.weekday-1]})
+` +
+    `AD ${cityDate.getUTCFullYear()} · ${gregMon} · ${cityDate.getUTCDate()} · ${gregWD}`;
+  document.getElementById("gregorian").textContent = "";
   document.getElementById("timeDisplay").textContent = `${hh}:${mm}:${ss}`;
   // Jean Meeus algorithm for equinox/solstice times, accurate to ~minutes for any year
   // Returns a Date object in UTC
   const solarTzOff = getCityOffset(city);
+  // Solar events based on the Gregorian year of day 1 of the currently displayed quarter
+  const gridDay1Date = new Date(enoch.dayBoundaryUTC.getTime());
+  // quarterOffset shifts which quarter is displayed; find the year for day 1 of that quarter
+  const displayedEqYear = enoch.dayBoundaryUTC.getUTCMonth() >= 2
+    ? enoch.dayBoundaryUTC.getUTCFullYear()
+    : enoch.dayBoundaryUTC.getUTCFullYear() - 1;
+  // Day 1 of displayed quarter
+  const displayedMONTHS = getMonths(displayedEqYear);
+  const displayedBase = (Math.floor(enoch.monthIndex / 3) + quarterOffset);
+  let displayedAbsQ = displayedBase;
+  let displayedYearShift = 0;
+  while (displayedAbsQ < 0) { displayedAbsQ += 4; displayedYearShift--; }
+  while (displayedAbsQ > 3) { displayedAbsQ -= 4; displayedYearShift++; }
+  const solarYr = displayedEqYear + displayedYearShift;
+  const solarTzOff2 = getCityOffset(city);
+  function fmtWithComma(utcDate, tzOff) {
+    const s = fmtSolarLocal(utcDate, tzOff);
+    // Insert comma before the time part (last two tokens "HH:MM")
+    const parts = s.split("  ");
+    return parts.length === 2 ? parts[0] + ",  " + parts[1] : s;
+  }
   document.getElementById("solarPoints").innerHTML =
-    `🌅 Spring Eq: ${fmtSolarLocal(solarEventUTC(yr, 0), solarTzOff)}<br>` +
-    `☀️ Summer Sol: ${fmtSolarLocal(solarEventUTC(yr, 1), solarTzOff)}<br>` +
-    `🍂 Autumn Eq: ${fmtSolarLocal(solarEventUTC(yr, 2), solarTzOff)}<br>` +
-    `❄️ Winter Sol: ${fmtSolarLocal(solarEventUTC(yr, 3), solarTzOff)}`;
+    `<span style="color:rgb(80,140,20)">🌱 Spring Eq:</span> ${fmtWithComma(solarEventUTC(solarYr, 0), solarTzOff2)}<br>` +
+    `<span style="color:rgb(200,100,0)">☀️ Summer Sol:</span> ${fmtWithComma(solarEventUTC(solarYr, 1), solarTzOff2)}<br>` +
+    `<span style="color:rgb(110,50,30)">🍂 Autumn Eq:</span> ${fmtWithComma(solarEventUTC(solarYr, 2), solarTzOff2)}<br>` +
+    `<span style="color:rgb(75,75,85)">❄️ Winter Sol:</span> ${fmtWithComma(solarEventUTC(solarYr, 3), solarTzOff2)}`;
 
   // Sabbath DoW: Enoch day 7 = spring equinox + 6 days, show G-DoW for prev/curr/next year
   const G_WD = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
@@ -743,38 +818,127 @@ function update() {
   const prevYr = yr - 1, nextYr = yr + 1;
   document.getElementById("solarDoW").innerHTML =
     `<div class="dow-header">SABBATH (Gregorian DoW)</div>` +
-    `<span class="yr-prev">${prevYr}: ${sabbathGDoW(prevYr)}</span> · ` +
-    `<span class="yr-curr">${yr}: ${sabbathGDoW(yr)}</span> · ` +
-    `<span class="yr-next">${nextYr}: ${sabbathGDoW(nextYr)}</span>`;
+    `<span class="yr-prev">AD ${prevYr}: ${sabbathGDoW(prevYr)}</span> · ` +
+    `<span class="yr-curr">AD ${yr}: ${sabbathGDoW(yr)}</span> · ` +
+    `<span class="yr-next">AD ${nextYr}: ${sabbathGDoW(nextYr)}</span>`;
 
   drawClock(cityDate, tzOff);
-  // springEqForGrid: use the precise equinox UTC time already computed in getEnoch
-  // dayBoundaryUTC is the sunrise on the equinox day = Enoch day 1 start
-  // Back-calculate the equinox year from dayBoundaryUTC for solarEventUTC lookup
-  const enochEqYear = enoch.dayBoundaryUTC.getUTCFullYear() === new Date(enoch.dayBoundaryUTC.getTime()).getUTCFullYear()
-    ? (() => {
-        // dayBoundaryUTC is sunrise on Mar 19/20 of the equinox year
-        const d = enoch.dayBoundaryUTC;
-        return d.getUTCMonth() >= 2 ? d.getUTCFullYear() : d.getUTCFullYear() - 1;
-      })()
-    : enoch.dayBoundaryUTC.getUTCFullYear();
-  const springEqForGrid = solarEventUTC(
-    enoch.dayBoundaryUTC.getUTCMonth() >= 2
-      ? enoch.dayBoundaryUTC.getUTCFullYear()
-      : enoch.dayBoundaryUTC.getUTCFullYear() - 1,
-    0
-  );
-  drawGrid(enoch, springEqForGrid, quarterOffset);
+  // Pass today's correct Gregorian DoW so drawGrid can anchor column headers from known-good value
+  const springEqForGrid = solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0);
+  drawGrid(enoch, springEqForGrid, quarterOffset, cityDate.getUTCDay());
 }
 
-document.getElementById("setCity").addEventListener("click", () => {
-  const key = document.getElementById("cityInput").value.trim().toLowerCase();
-  if (CITY_DB[key]) {
-    city = CITY_DB[key];
-    document.getElementById("cityName").textContent = key;
+// Built-in city fallback — used when network is unavailable (e.g. sandboxed preview)
+const CITY_FALLBACK = {
+  "vancouver":       { lat: 49.2827,  lon: -123.1207, tzId: "America/Vancouver",    name: "Vancouver, Canada" },
+  "victoria":        { lat: 48.4284,  lon: -123.3656, tzId: "America/Vancouver",    name: "Victoria, Canada" },
+  "toronto":         { lat: 43.6532,  lon: -79.3832,  tzId: "America/Toronto",      name: "Toronto, Canada" },
+  "montreal":        { lat: 45.5017,  lon: -73.5673,  tzId: "America/Toronto",      name: "Montreal, Canada" },
+  "calgary":         { lat: 51.0447,  lon: -114.0719, tzId: "America/Edmonton",     name: "Calgary, Canada" },
+  "edmonton":        { lat: 53.5461,  lon: -113.4938, tzId: "America/Edmonton",     name: "Edmonton, Canada" },
+  "winnipeg":        { lat: 49.8951,  lon: -97.1384,  tzId: "America/Winnipeg",     name: "Winnipeg, Canada" },
+  "ottawa":          { lat: 45.4215,  lon: -75.6972,  tzId: "America/Toronto",      name: "Ottawa, Canada" },
+  "new york":        { lat: 40.7128,  lon: -74.0060,  tzId: "America/New_York",     name: "New York, USA" },
+  "los angeles":     { lat: 34.0522,  lon: -118.2437, tzId: "America/Los_Angeles",  name: "Los Angeles, USA" },
+  "chicago":         { lat: 41.8781,  lon: -87.6298,  tzId: "America/Chicago",      name: "Chicago, USA" },
+  "houston":         { lat: 29.7604,  lon: -95.3698,  tzId: "America/Chicago",      name: "Houston, USA" },
+  "seattle":         { lat: 47.6062,  lon: -122.3321, tzId: "America/Los_Angeles",  name: "Seattle, USA" },
+  "miami":           { lat: 25.7617,  lon: -80.1918,  tzId: "America/New_York",     name: "Miami, USA" },
+  "denver":          { lat: 39.7392,  lon: -104.9903, tzId: "America/Denver",       name: "Denver, USA" },
+  "phoenix":         { lat: 33.4484,  lon: -112.0740, tzId: "America/Phoenix",      name: "Phoenix, USA" },
+  "hawaii":          { lat: 21.3069,  lon: -157.8583, tzId: "Pacific/Honolulu",     name: "Honolulu, Hawaii" },
+  "honolulu":        { lat: 21.3069,  lon: -157.8583, tzId: "Pacific/Honolulu",     name: "Honolulu, Hawaii" },
+  "mexico city":     { lat: 19.4326,  lon: -99.1332,  tzId: "America/Mexico_City",  name: "Mexico City, Mexico" },
+  "guadalajara":     { lat: 20.6597,  lon: -103.3496, tzId: "America/Mexico_City",  name: "Guadalajara, Mexico" },
+  "london":          { lat: 51.5074,  lon: -0.1278,   tzId: "Europe/London",        name: "London, UK" },
+  "paris":           { lat: 48.8566,  lon: 2.3522,    tzId: "Europe/Paris",         name: "Paris, France" },
+  "berlin":          { lat: 52.5200,  lon: 13.4050,   tzId: "Europe/Berlin",        name: "Berlin, Germany" },
+  "rome":            { lat: 41.9028,  lon: 12.4964,   tzId: "Europe/Rome",          name: "Rome, Italy" },
+  "madrid":          { lat: 40.4168,  lon: -3.7038,   tzId: "Europe/Madrid",        name: "Madrid, Spain" },
+  "amsterdam":       { lat: 52.3676,  lon: 4.9041,    tzId: "Europe/Amsterdam",     name: "Amsterdam, Netherlands" },
+  "zurich":          { lat: 47.3769,  lon: 8.5417,    tzId: "Europe/Zurich",        name: "Zurich, Switzerland" },
+  "athens":          { lat: 37.9838,  lon: 23.7275,   tzId: "Europe/Athens",        name: "Athens, Greece" },
+  "stockholm":       { lat: 59.3293,  lon: 18.0686,   tzId: "Europe/Stockholm",     name: "Stockholm, Sweden" },
+  "oslo":            { lat: 59.9139,  lon: 10.7522,   tzId: "Europe/Oslo",          name: "Oslo, Norway" },
+  "warsaw":          { lat: 52.2297,  lon: 21.0122,   tzId: "Europe/Warsaw",        name: "Warsaw, Poland" },
+  "moscow":          { lat: 55.7558,  lon: 37.6173,   tzId: "Europe/Moscow",        name: "Moscow, Russia" },
+  "istanbul":        { lat: 41.0082,  lon: 28.9784,   tzId: "Europe/Istanbul",      name: "Istanbul, Turkey" },
+  "tel aviv":        { lat: 32.0853,  lon: 34.7818,   tzId: "Asia/Jerusalem",       name: "Tel Aviv, Israel" },
+  "jerusalem":       { lat: 31.7683,  lon: 35.2137,   tzId: "Asia/Jerusalem",       name: "Jerusalem, Israel" },
+  "cairo":           { lat: 30.0444,  lon: 31.2357,   tzId: "Africa/Cairo",         name: "Cairo, Egypt" },
+  "dubai":           { lat: 25.2048,  lon: 55.2708,   tzId: "Asia/Dubai",           name: "Dubai, UAE" },
+  "riyadh":          { lat: 24.7136,  lon: 46.6753,   tzId: "Asia/Riyadh",          name: "Riyadh, Saudi Arabia" },
+  "amman":           { lat: 31.9454,  lon: 35.9284,   tzId: "Asia/Amman",           name: "Amman, Jordan" },
+  "beirut":          { lat: 33.8938,  lon: 35.5018,   tzId: "Asia/Beirut",          name: "Beirut, Lebanon" },
+  "tehran":          { lat: 35.6892,  lon: 51.3890,   tzId: "Asia/Tehran",          name: "Tehran, Iran" },
+  "karachi":         { lat: 24.8607,  lon: 67.0011,   tzId: "Asia/Karachi",         name: "Karachi, Pakistan" },
+  "delhi":           { lat: 28.6139,  lon: 77.2090,   tzId: "Asia/Kolkata",         name: "Delhi, India" },
+  "mumbai":          { lat: 19.0760,  lon: 72.8777,   tzId: "Asia/Kolkata",         name: "Mumbai, India" },
+  "kolkata":         { lat: 22.5726,  lon: 88.3639,   tzId: "Asia/Kolkata",         name: "Kolkata, India" },
+  "bangalore":       { lat: 12.9716,  lon: 77.5946,   tzId: "Asia/Kolkata",         name: "Bangalore, India" },
+  "dhaka":           { lat: 23.8103,  lon: 90.4125,   tzId: "Asia/Dhaka",           name: "Dhaka, Bangladesh" },
+  "kathmandu":       { lat: 27.7172,  lon: 85.3240,   tzId: "Asia/Kathmandu",       name: "Kathmandu, Nepal" },
+  "colombo":         { lat: 6.9271,   lon: 79.8612,   tzId: "Asia/Colombo",         name: "Colombo, Sri Lanka" },
+  "bangkok":         { lat: 13.7563,  lon: 100.5018,  tzId: "Asia/Bangkok",         name: "Bangkok, Thailand" },
+  "singapore":       { lat: 1.3521,   lon: 103.8198,  tzId: "Asia/Singapore",       name: "Singapore" },
+  "kuala lumpur":    { lat: 3.1390,   lon: 101.6869,  tzId: "Asia/Kuala_Lumpur",    name: "Kuala Lumpur, Malaysia" },
+  "jakarta":         { lat: -6.2088,  lon: 106.8456,  tzId: "Asia/Jakarta",         name: "Jakarta, Indonesia" },
+  "manila":          { lat: 14.5995,  lon: 120.9842,  tzId: "Asia/Manila",          name: "Manila, Philippines" },
+  "hong kong":       { lat: 22.3193,  lon: 114.1694,  tzId: "Asia/Hong_Kong",       name: "Hong Kong" },
+  "shanghai":        { lat: 31.2304,  lon: 121.4737,  tzId: "Asia/Shanghai",        name: "Shanghai, China" },
+  "beijing":         { lat: 39.9042,  lon: 116.4074,  tzId: "Asia/Shanghai",        name: "Beijing, China" },
+  "tokyo":           { lat: 35.6762,  lon: 139.6503,  tzId: "Asia/Tokyo",           name: "Tokyo, Japan" },
+  "osaka":           { lat: 34.6937,  lon: 135.5023,  tzId: "Asia/Tokyo",           name: "Osaka, Japan" },
+  "seoul":           { lat: 37.5665,  lon: 126.9780,  tzId: "Asia/Seoul",           name: "Seoul, South Korea" },
+  "sydney":          { lat: -33.8688, lon: 151.2093,  tzId: "Australia/Sydney",     name: "Sydney, Australia" },
+  "melbourne":       { lat: -37.8136, lon: 144.9631,  tzId: "Australia/Melbourne",  name: "Melbourne, Australia" },
+  "brisbane":        { lat: -27.4698, lon: 153.0251,  tzId: "Australia/Brisbane",   name: "Brisbane, Australia" },
+  "perth":           { lat: -31.9505, lon: 115.8605,  tzId: "Australia/Perth",      name: "Perth, Australia" },
+  "auckland":        { lat: -36.8485, lon: 174.7633,  tzId: "Pacific/Auckland",     name: "Auckland, New Zealand" },
+  "johannesburg":    { lat: -26.2041, lon: 28.0473,   tzId: "Africa/Johannesburg",  name: "Johannesburg, South Africa" },
+  "nairobi":         { lat: -1.2921,  lon: 36.8219,   tzId: "Africa/Nairobi",       name: "Nairobi, Kenya" },
+  "lagos":           { lat: 6.5244,   lon: 3.3792,    tzId: "Africa/Lagos",         name: "Lagos, Nigeria" },
+  "accra":           { lat: 5.6037,   lon: -0.1870,   tzId: "Africa/Accra",         name: "Accra, Ghana" },
+  "casablanca":      { lat: 33.5731,  lon: -7.5898,   tzId: "Africa/Casablanca",    name: "Casablanca, Morocco" },
+  "addis ababa":     { lat: 9.0320,   lon: 38.7469,   tzId: "Africa/Addis_Ababa",   name: "Addis Ababa, Ethiopia" },
+  "sao paulo":       { lat: -23.5505, lon: -46.6333,  tzId: "America/Sao_Paulo",    name: "São Paulo, Brazil" },
+  "rio de janeiro":  { lat: -22.9068, lon: -43.1729,  tzId: "America/Sao_Paulo",    name: "Rio de Janeiro, Brazil" },
+  "buenos aires":    { lat: -34.6037, lon: -58.3816,  tzId: "America/Argentina/Buenos_Aires", name: "Buenos Aires, Argentina" },
+  "santiago":        { lat: -33.4489, lon: -70.6693,  tzId: "America/Santiago",     name: "Santiago, Chile" },
+  "lima":            { lat: -12.0464, lon: -77.0428,  tzId: "America/Lima",         name: "Lima, Peru" },
+  "bogota":          { lat: 4.7110,   lon: -74.0721,  tzId: "America/Bogota",       name: "Bogotá, Colombia" },
+};
+
+document.getElementById("setCity").addEventListener("click", async () => {
+  const input = document.getElementById("cityInput").value.trim();
+  if (!input) return;
+  const key = input.toLowerCase();
+
+  // Check built-in fallback first (works offline/sandboxed)
+  if (CITY_FALLBACK[key]) {
+    city = CITY_FALLBACK[key];
+    document.getElementById("cityName").textContent = city.name;
     document.getElementById("error").textContent = "";
-  } else {
-    document.getElementById("error").textContent = "Unknown city. Try: " + Object.keys(CITY_DB).join(", ");
+    quarterOffset = 0;
+    return;
+  }
+
+  // Try live geocoding for any other city
+  document.getElementById("error").textContent = "Searching…";
+  try {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=1&language=en&format=json`);
+    const data = await res.json();
+    if (!data.results || data.results.length === 0) {
+      document.getElementById("error").textContent = "City not found. Try a different name.";
+      return;
+    }
+    const r = data.results[0];
+    city = { lat: r.latitude, lon: r.longitude, tzId: r.timezone, name: r.name + (r.country ? ", " + r.country : "") };
+    document.getElementById("cityName").textContent = city.name;
+    document.getElementById("error").textContent = "";
+    quarterOffset = 0;
+  } catch(e) {
+    document.getElementById("error").textContent = "Network unavailable. Try: " + Object.keys(CITY_FALLBACK).slice(0,6).join(", ") + "…";
   }
 });
 document.getElementById("cityInput").addEventListener("keydown", e => {
@@ -785,19 +949,13 @@ document.getElementById("prevQuarter").addEventListener("click", () => {
   quarterOffset--;
   const utcNow = new Date();
   const enoch = getEnoch(utcNow, city);
-  const eqYr = enoch.dayBoundaryUTC.getUTCMonth() >= 2
-    ? enoch.dayBoundaryUTC.getUTCFullYear()
-    : enoch.dayBoundaryUTC.getUTCFullYear() - 1;
-  drawGrid(enoch, solarEventUTC(eqYr, 0), quarterOffset);
+  drawGrid(enoch, solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0), quarterOffset);
 });
 document.getElementById("nextQuarter").addEventListener("click", () => {
   quarterOffset++;
   const utcNow = new Date();
   const enoch = getEnoch(utcNow, city);
-  const eqYr = enoch.dayBoundaryUTC.getUTCMonth() >= 2
-    ? enoch.dayBoundaryUTC.getUTCFullYear()
-    : enoch.dayBoundaryUTC.getUTCFullYear() - 1;
-  drawGrid(enoch, solarEventUTC(eqYr, 0), quarterOffset);
+  drawGrid(enoch, solarEventUTC(enoch.dayBoundaryUTC.getUTCFullYear(), 0), quarterOffset);
 });
 
 setInterval(update, 1000);
@@ -811,11 +969,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function showTooltip(el, clientX, clientY) {
     feastTooltip.textContent = el.dataset.desc;
     feastTooltip.style.display = "block";
-    const tw = 220, th = feastTooltip.offsetHeight;
+    const tw = Math.min(220, window.innerWidth - 16);
+    feastTooltip.style.width = tw + "px";
+    const th = feastTooltip.offsetHeight;
     let x = clientX + 10;
     let y = clientY - th - 8;
     if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+    if (x < 8) x = 8;
     if (y < 8) y = clientY + 16;
+    if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
     feastTooltip.style.left = x + "px";
     feastTooltip.style.top  = y + "px";
   }
@@ -849,8 +1011,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// Grid day tooltip — fixed position, clamped to viewport
+document.addEventListener("DOMContentLoaded", () => {
+  const dayTip = document.getElementById("day-tooltip");
+  const grid = document.getElementById("gridContainer");
+  if (!dayTip || !grid) return;
+
+  function showDayTip(box, clientX, clientY) {
+    const inner = box.querySelector(".tooltip");
+    if (!inner) return;
+    dayTip.textContent = inner.textContent;
+    dayTip.style.display = "block";
+    const tw = dayTip.offsetWidth, th = dayTip.offsetHeight;
+    let x = clientX - tw / 2;
+    let y = clientY - th - 10;
+    if (x < 8) x = 8;
+    if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+    if (y < 8) y = clientY + 14;
+    if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
+    dayTip.style.left = x + "px";
+    dayTip.style.top  = y + "px";
+  }
+
+  // Mouse
+  grid.addEventListener("mouseover", e => {
+    const box = e.target.closest(".dayBox");
+    if (box) showDayTip(box, e.clientX, e.clientY);
+    else dayTip.style.display = "none";
+  });
+  grid.addEventListener("mousemove", e => {
+    const box = e.target.closest(".dayBox");
+    if (box) showDayTip(box, e.clientX, e.clientY);
+    else dayTip.style.display = "none";
+  });
+  grid.addEventListener("mouseout", e => {
+    if (!e.target.closest(".dayBox")) dayTip.style.display = "none";
+  });
+
+  // Touch — tap to show, tap elsewhere to hide
+  grid.addEventListener("touchstart", e => {
+    const box = e.target.closest(".dayBox");
+    if (!box) { dayTip.style.display = "none"; return; }
+    e.preventDefault();
+    const t = e.touches[0];
+    showDayTip(box, t.clientX, t.clientY);
+  }, { passive: false });
+  document.addEventListener("touchstart", e => {
+    if (!e.target.closest(".dayBox") && !e.target.closest("#day-tooltip")) {
+      dayTip.style.display = "none";
+    }
+  });
+});
 update();
 </script>
 <div id="feast-tooltip"></div>
+<div id="day-tooltip"></div>
 </body>
 </html>
