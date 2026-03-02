@@ -35,7 +35,9 @@ h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 
   }
   #clockCol  { width: 260px; flex-shrink: 0; }
   #feastCol  { width: 240px; flex-shrink: 0; }
-  #gridWrapper { flex-shrink: 0; }
+  #gridWrapper { flex: 1; min-width: 0; }
+  #gridContainer { max-width: 100% !important; }
+  #gridCarousel { width: 100%; }
 }
 /* Clock column */
 #clockCol { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 100%; max-width: 320px; }
@@ -91,9 +93,10 @@ button {
   max-width: 350px;
 }
 @media (min-width: 900px) {
-  #gridContainer { gap: 3px; max-width: 420px; }
-  .dayBox { font-size: 9px; }
-  .dayNum { font-size: 11px; }
+  #gridContainer { gap: 3px; }
+  .dayBox { font-size: clamp(7px, 0.9vw, 10px); }
+  .dayNum { font-size: clamp(9px, 1.1vw, 13px); }
+  .dayHeader { font-size: clamp(7px, 0.85vw, 11px); }
 }
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
