@@ -30,14 +30,33 @@ h2 { letter-spacing: 4px; color: #f5c842; text-transform: uppercase; font-size: 
 /* Desktop 3-column layout */
 @media (min-width: 900px) {
   #mainContainer {
-    flex-direction: row; align-items: flex-start;
+    flex-direction: row; align-items: stretch;
     justify-content: center; gap: 24px;
+    height: calc(100vh - 90px); /* 90px ≈ fixed header height */
+    overflow: hidden;
   }
   #clockCol  { width: 260px; flex-shrink: 0; }
   #feastCol  { width: 240px; flex-shrink: 0; }
-  #gridWrapper { flex: 1; min-width: 0; }
+  #gridWrapper { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   #gridContainer { max-width: 100% !important; }
-  #gridCarousel { width: 100%; }
+  #gridCarousel { width: 100%; flex: 1; min-height: 0; }
+  /* Grid fills remaining vertical space */
+  #gridContainer {
+    flex: 1; min-height: 0;
+    grid-auto-rows: 1fr;
+    align-content: stretch;
+  }
+  /* Heading labels scale with vh */
+  #gridHeading .season-name  { font-size: clamp(10px, 1.8vh, 16px); }
+  #gridHeading .enoch-year   { font-size: clamp(8px,  1.3vh, 12px); }
+  #gridHeading .greg-year    { font-size: clamp(8px,  1.3vh, 12px); }
+  #gridHeading .season-angel { font-size: clamp(7px,  1.2vh, 11px); }
+  #gridHeading .season-start { font-size: clamp(7px,  1.2vh, 11px); }
+  /* Tile text scales with vh */
+  .dayNum      { font-size: clamp(7px,  1.4vh, 13px) !important; }
+  .angelLabel  { font-size: clamp(5px,  0.9vh,  8px) !important; }
+  .dayBox      { font-size: clamp(6px,  1.0vh, 10px) !important; }
+  .dayHeader   { font-size: clamp(6px,  1.0vh, 11px) !important; padding: clamp(1px, 0.4vh, 4px) 0; }
 }
 /* Clock column */
 #clockCol { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 100%; max-width: 320px; }
@@ -73,14 +92,14 @@ button {
 #solarDoW .yr-item { color: #4da6ff; }
 #solarDoW .yr-item.is-current { font-weight: bold; }
 #solarDoW .yr-item.is-adjacent { opacity: 0.6; }
-#gridWrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#gridWrapper { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
 #gridHeading { text-align: center; line-height: 1.7; }
 #gridHeading .season-name { font-size: clamp(13px,3vw,16px); font-weight: bold; color: #f5c842; letter-spacing: 3px; text-transform: uppercase; }
 #gridHeading .enoch-year { font-size: clamp(10px,2.5vw,12px); color: rgba(255,255,255,0.7); letter-spacing: 2px; }
 #gridHeading .greg-year  { font-size: clamp(10px,2.5vw,12px); color: #4da6ff; letter-spacing: 2px; }
 #gridHeading .season-angel { font-size: clamp(10px,2.5vw,11px); color: rgba(255,255,255,0.6); letter-spacing: 1px; font-style: italic; }
 #gridHeading .season-start { font-size: clamp(10px,2.5vw,11px); letter-spacing: 1px; margin-top: 2px; }
-#gridCarousel { display: flex; align-items: center; gap: 6px; width: 100%; }
+#gridCarousel { display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1; min-height: 0; }
 .arrow-btn {
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
   color: white; font-size: 18px; border-radius: 6px; cursor: pointer;
@@ -91,12 +110,6 @@ button {
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px; width: 100%;
   max-width: 350px;
-}
-@media (min-width: 900px) {
-  #gridContainer { gap: 3px; }
-  .dayBox { font-size: clamp(7px, 0.9vw, 10px); }
-  .dayNum { font-size: clamp(9px, 1.1vw, 13px); }
-  .dayHeader { font-size: clamp(7px, 0.85vw, 11px); }
 }
 .dayHeader { color: #f5c842; font-weight: bold; text-align: center; font-size: clamp(8px,2vw,11px); padding: 4px 0; }
 .dayBox {
